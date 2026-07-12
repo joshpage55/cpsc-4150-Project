@@ -48,3 +48,11 @@ app.*.map.json
 
 # Ignore the venv
 .venv/
+
+# Secrets — never commit API keys or team Canvas keys
+.env
+.env.*
+!.env.example
+functions/.secret.local
+functions/.env
+*.pem

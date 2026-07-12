@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 // import 'package:readright/utils/firestore_utils.dart';
@@ -62,10 +63,12 @@ class _AppInitializerState extends State<AppInitializer> {
     super.initState();
 
     _loadSharedPreferences();
-    
-    //FCM
-    FirebaseNotificationService.instance.initialize();
-    FirebaseNotificationService.instance.handleInitialMessage();
+
+    if (!kIsWeb) {
+      // FCM is mobile-only; accessing FirebaseMessaging on web crashes without a web app.
+      FirebaseNotificationService.instance.initialize();
+      FirebaseNotificationService.instance.handleInitialMessage();
+    }
 
     // Run init after the first frame to keep startup fast.
     WidgetsBinding.instance.addPostFrameCallback((_) => _initOnce());
@@ -96,6 +99,8 @@ class _AppInitializerState extends State<AppInitializer> {
   Future<void> _initOnce() async {
     if (_initialized) return;
     _initialized = true;
+
+    if (kIsWeb) return;
 
     try {
       // Enable persistence and set cache size; ignore on web where settings may differ.
@@ -219,15 +224,17 @@ class _AppInitializerState extends State<AppInitializer> {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  try{
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
-    FirebaseMessaging.onBackgroundMessage(
-      FirebaseNotificationService.firebaseMessagingBackgroundHandler,
-    );
-  } catch (e, st) {
-    debugPrint('Firebase initialization failed: $e\n$st');
+  if (!kIsWeb) {
+    try {
+      await Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      );
+      FirebaseMessaging.onBackgroundMessage(
+        FirebaseNotificationService.firebaseMessagingBackgroundHandler,
+      );
+    } catch (e, st) {
+      debugPrint('Firebase initialization failed: $e\n$st');
+    }
   }
 
   // Keep app startup non-blocking: create notifiers immediately (they are lazy)

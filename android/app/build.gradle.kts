@@ -16,7 +16,8 @@ repositories {
 android {
     namespace = "com.example.readright"
     compileSdk = 36
-    ndkVersion = flutter.ndkVersion
+    // Use installed NDK; avoids broken partial download of flutter.ndkVersion (28.2.x).
+    ndkVersion = "28.0.12433566"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
