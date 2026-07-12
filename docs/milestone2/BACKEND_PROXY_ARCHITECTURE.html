@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Backend Proxy and Secret Handling — M2</title>
+  <style>
+    body { font-family: Georgia, serif; max-width: 700px; margin: 2em auto; line-height: 1.5; }
+    h1 { font-size: 1.4em; }
+    h2 { font-size: 1.15em; margin-top: 1.5em; }
+    table { border-collapse: collapse; width: 100%; font-size: 0.9em; }
+    th, td { border: 1px solid #333; padding: 6px 8px; text-align: left; }
+    pre { font-size: 0.75em; overflow-x: auto; }
+    @media print { body { margin: 1in; } }
+  </style>
+</head>
+<body>
+<h1>Backend Proxy &amp; Secret Handling (M2)</h1>
+<p><strong>Team:</strong> CPSC 4150 ReadRight &nbsp;|&nbsp; <strong>Project:</strong> cpsc4150-readright</p>
+
+<h2>1. Problem</h2>
+<p>The Flutter app must never embed LLM or STT API keys. M2 requires generative-AI calls through a thin backend proxy. M2 proves this with the story spike; M3 will move Deepgram STT behind the same pattern.</p>
+
+<h2>2. Architecture</h2>
+<pre>Flutter app → HTTPS (no key) → Cloud Function generateStorySpike → GEMINI_API_KEY (secret) → Gemini mini-tier API</pre>
+<table>
+<tr><th>Layer</th><th>Responsibility</th></tr>
+<tr><td>Flutter</td><td>Sends Dolch word list; displays story</td></tr>
+<tr><td>Cloud Function</td><td>Prompt assembly, model allowlist, calls Gemini</td></tr>
+<tr><td>Secret store</td><td>firebase functions:secrets:set GEMINI_API_KEY</td></tr>
+<tr><td>GitHub</td><td>Source only; .env gitignored</td></tr>
+</table>
+
+<h2>3. Where the key lives</h2>
+<table>
+<tr><th>Location</th><th>Allowed?</th></tr>
+<tr><td>Firebase Functions secret</td><td>Yes</td></tr>
+<tr><td>Local .env (gitignored)</td><td>Yes, dev spike only</td></tr>
+<tr><td>Canvas private post</td><td>Yes, team distribution</td></tr>
+<tr><td>Committed Dart/JS source</td><td>No</td></tr>
+</table>
+
+<h2>4. Dolch prompt design</h2>
+<p>Proxy lists allowed Dolch words, caps length (80–120 words), targets grade 1–2 reading level, returns plain text. See functions/storyPrompt.js.</p>
+
+<h2>5. Model guardrail</h2>
+<p>Mini-tier only (GEMINI_MODEL=gemini-2.0-flash-lite). Function rejects models outside allowlist.</p>
+
+<h2>6. GitHub safety</h2>
+<p>.gitignore blocks .env; .env.example has names only; review PRs for leaked keys; rotate if committed.</p>
+
+<h2>7. Local spike vs production</h2>
+<table>
+<tr><th>Mode</th><th>Command</th></tr>
+<tr><td>Local</td><td>node scripts/m2_story_spike.mjs</td></tr>
+<tr><td>Production</td><td>firebase deploy --only functions:generateStorySpike</td></tr>
+</table>
+
+<h2>8. Threat model</h2>
+<p>Key not in app or repo; maxInstances cap; Blaze budget alert; App Check planned for M3.</p>
+
+<h2>9. M3 extensions</h2>
+<p>Flutter StoryService, Deepgram proxy, teacher story approval.</p>
+
+<p><em>Josh Page — CPSC 4150 M2</em></p>
+</body>
+</html>

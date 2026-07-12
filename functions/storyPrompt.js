@@ -2,7 +2,7 @@
  * Dolch-constrained story prompt for M2 spike / M3 Story Builder.
  */
 
-/** Mini-tier models allowed for course guardrails — update if Canvas specifies another name. */
+/** Mini-tier models allowed for course guardrails. */
 const ALLOWED_MODELS = new Set([
   "gemini-2.0-flash-lite",
   "gemini-2.0-flash-lite-001",
@@ -31,7 +31,8 @@ function buildStoryPrompt(dolchWords, maxWords = 120) {
 
   const user = [
     `Write a story of about 80-${maxWords} words for a first-grade reader.`,
-    `You MUST include several of these Dolch sight words naturally: ${wordList.join(", ")}.`,
+    "You MUST include several of these Dolch sight words naturally: " +
+      wordList.join(", ") + ".",
     "Keep sentences short. No scary content.",
   ].join(" ");
 
@@ -45,8 +46,9 @@ function buildStoryPrompt(dolchWords, maxWords = 120) {
 function resolveModel(model) {
   const chosen = (model || process.env.GEMINI_MODEL || DEFAULT_MODEL).trim();
   if (!ALLOWED_MODELS.has(chosen)) {
+    const allowed = [...ALLOWED_MODELS].join(", ");
     throw new Error(
-        `Model "${chosen}" is not allowed. Use mini-tier only: ${[...ALLOWED_MODELS].join(", ")}`,
+        `Model "${chosen}" is not allowed. Use mini-tier only: ${allowed}`,
     );
   }
   return chosen;
@@ -59,7 +61,7 @@ function resolveModel(model) {
  * @param {string} params.model
  * @param {string} params.system
  * @param {string} params.user
- * @return {Promise<{story: string, model: string, usage: object|null}>}
+ * @return {Promise<Object>}
  */
 async function generateStoryWithGemini({apiKey, model, system, user}) {
   const resolvedModel = resolveModel(model);

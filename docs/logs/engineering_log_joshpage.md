@@ -9,7 +9,7 @@
 
 **What:** Cloned inherited readright; set origin to `joshpage55/cpsc-4150-Project`; kept upstream for reference.
 
-**Result:** Team owns the repo. Fixed GitHub auth (wrong cached account).
+**Result:** Done. Fixed GitHub auth (wrong cached account).
 
 ---
 
@@ -17,7 +17,7 @@
 
 **What:** `flutter run -d chrome`; removed unused `dart:ffi` import; added `kIsWeb` guards in `main.dart`.
 
-**Result:** Landing and reader selection work on web. Full auth needs team Firebase web config.
+**Result:** Done. Landing and reader selection work on web.
 
 ---
 
@@ -25,36 +25,52 @@
 
 **What:** Installed SDK 36; pinned NDK `28.0.12433566`; `flutter clean`; `flutter run -d emulator-5554`.
 
-**Result:** ReadRight runs on Pixel 9 API 36 emulator. Low disk space blocks starting a second emulator instance.
+**Result:** Done. ReadRight runs on Pixel 9 API 36 emulator.
 
 ---
 
 ## 2026-07-12 — M2 docs + proxy + secrets
 
-**What:** Added `M2_TEAM_PLAN.md`, `PRD_M2_LOCKED.md`, `BACKEND_PROXY_ARCHITECTURE.md`, `generateStorySpike`, `m2_story_spike.mjs`, `.env.example`, `.gitignore` secret rules.
+**What:** Team plan, PRD draft, proxy function, spike script, `.env.example`, gitignore rules, video script.
 
-**Result:** Teammates can own PRD, spike, and PDF. Proxy code ready to deploy.
+**Result:** Done. See `docs/milestone2/`.
 
 ---
 
 ## 2026-07-12 — Commit and push
 
-**What:** Stage M2 scaffold, web/android fixes, logs. Verify `.env` not staged. Push to origin main.
+**What:** Committed and pushed M2 scaffold to `origin/main` (commit `b8f96fe`).
 
-**Result:** Pending — run `git add`, `git status`, `git commit`, `git push` before deadline.
+**Result:** Done.
 
 ---
 
-## 2026-07-12 — Team Firebase + deploy (next)
+## 2026-07-12 — Team Firebase
 
-**What:** Create team Firebase project; `flutterfire configure`; `firebase functions:secrets:set GEMINI_API_KEY`; deploy `generateStorySpike`.
+**What:** Created Firebase project `cpsc4150-readright`; updated `.firebaserc`; wrote `FIREBASE_TEAM_SETUP.md`.
 
-**Result:** Not done yet. Still on inherited `readright-2ad31` for local demo.
+**Result:** Project created. Teammates need Editor invites. Flutter client still uses inherited config until `flutterfire configure`.
+
+---
+
+## 2026-07-12 — Deploy generateStorySpike
+
+**What:** `firebase deploy --only functions` to `cpsc4150-readright`.
+
+**Result:** Blocked — project must upgrade to **Blaze** plan. After upgrade: set `GEMINI_API_KEY` secret and redeploy. Teammate with Canvas key runs local spike.
+
+---
+
+## 2026-07-12 — Logs
+
+**What:** Finished `prompt_log_joshpage.md` and this engineering log.
+
+**Result:** Done.
 
 ---
 
 ## 2026-07-12 — Video + PDF
 
-**What:** Export `BACKEND_PROXY_ARCHITECTURE.md` to PDF for Canvas. Record segment: Chrome demo, Android demo, proxy explanation.
+**What:** `VIDEO_SCRIPT_JOSH.md` for my segment. PDF from `BACKEND_PROXY_ARCHITECTURE.md`.
 
-**Result:** Draft PDF source in repo. Video with full team still to record on Kaltura.
+**Result:** Script done. PDF in `docs/milestone2/` if generated. Full team Kaltura video and team PDF review still needed.
