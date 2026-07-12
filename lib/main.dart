@@ -224,17 +224,17 @@ class _AppInitializerState extends State<AppInitializer> {
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  if (!kIsWeb) {
-    try {
-      await Firebase.initializeApp(
-        options: DefaultFirebaseOptions.currentPlatform,
-      );
+  try {
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    if (!kIsWeb) {
       FirebaseMessaging.onBackgroundMessage(
         FirebaseNotificationService.firebaseMessagingBackgroundHandler,
       );
-    } catch (e, st) {
-      debugPrint('Firebase initialization failed: $e\n$st');
     }
+  } catch (e, st) {
+    debugPrint('Firebase initialization failed: $e\n$st');
   }
 
   // Keep app startup non-blocking: create notifiers immediately (they are lazy)

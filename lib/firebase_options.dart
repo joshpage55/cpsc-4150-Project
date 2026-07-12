@@ -17,10 +17,7 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
@@ -50,20 +47,26 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyCfYmVjtPzbQOdHSACCn6igJiajIs6yF6w',
-    appId: '1:860505438253:android:6cf29a670d68848ef8e0a4',
-    messagingSenderId: '860505438253',
-    projectId: 'readright-2ad31',
-    storageBucket: 'readright-2ad31.firebasestorage.app',
+    apiKey: 'AIzaSyCx30WOjOMZuFOLd_I_e6bGP9zolodxtjE',
+    appId: '1:134556174423:android:70df3b5a6ae46340c3bb12',
+    messagingSenderId: '134556174423',
+    projectId: 'cpsc4150-readright',
+    storageBucket: 'cpsc4150-readright.firebasestorage.app',
   );
-
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBxOD-Mx7K6KAmq-GgC_-rK1cXQmb0YF8w',
-    appId: '1:860505438253:ios:034dc00e7b7a1d3cf8e0a4',
-    messagingSenderId: '860505438253',
-    projectId: 'readright-2ad31',
-    storageBucket: 'readright-2ad31.firebasestorage.app',
+    apiKey: 'AIzaSyCwkA3_ukT3xwYZM1af8Ne7KPa-POBWhdI',
+    appId: '1:134556174423:ios:1a87fdcb33d64775c3bb12',
+    messagingSenderId: '134556174423',
+    projectId: 'cpsc4150-readright',
+    storageBucket: 'cpsc4150-readright.firebasestorage.app',
     iosBundleId: 'com.example.readright',
   );
-
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyAOfx_Rmxetsavdz-dxwTM59RkMQpKSmQw',
+    appId: '1:134556174423:web:91bbe41f50778da6c3bb12',
+    messagingSenderId: '134556174423',
+    projectId: 'cpsc4150-readright',
+    authDomain: 'cpsc4150-readright.firebaseapp.com',
+    storageBucket: 'cpsc4150-readright.firebasestorage.app',
+  );
 }

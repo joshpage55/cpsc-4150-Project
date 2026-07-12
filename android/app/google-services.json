@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "860505438253",
-    "project_id": "readright-2ad31",
-    "storage_bucket": "readright-2ad31.firebasestorage.app"
+    "project_number": "134556174423",
+    "project_id": "cpsc4150-readright",
+    "storage_bucket": "cpsc4150-readright.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:860505438253:android:6cf29a670d68848ef8e0a4",
+        "mobilesdk_app_id": "1:134556174423:android:70df3b5a6ae46340c3bb12",
         "android_client_info": {
           "package_name": "com.example.readright"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCfYmVjtPzbQOdHSACCn6igJiajIs6yF6w"
+          "current_key": "AIzaSyCx30WOjOMZuFOLd_I_e6bGP9zolodxtjE"
         }
       ],
       "services": {
