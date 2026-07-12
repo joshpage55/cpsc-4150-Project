@@ -1,7 +1,7 @@
 # ReadRight — Milestone 2 Locked Plan (PRD-Style Change Proposal)
 
 **Team:** _[Josh Page, Tyson Small, Gabriel Walker]_  
-**Status:** DRAFT — lock by M2 submission  
+**Status:** LOCKED — M2 submission  
 **Baseline:** Inherited [readright](https://github.com/ztraboo/readright) @ Release 1.0  
 **M3 measures against this document.**
 
@@ -57,13 +57,13 @@ ReadRight helps children practice **Dolch sight-word pronunciation** with feedba
 - All LLM calls through `functions/generateStorySpike.js`
 
 ### M2 spike acceptance
-- [ ] One story generated with ≥5 Dolch words from Pre-Primer list
-- [ ] Evidence in `docs/milestone2/spike/`
-- [ ] Model name + prompt logged in engineering log
+- [x] One story generated with ≥5 Dolch words from Pre-Primer list
+- [x] Evidence in `docs/milestone2/spike/`
+- [x] Model name + prompt logged in engineering log
 
 ### Open decisions (Person B to finalize)
-- [ ] Teacher preview/approve before student sees story? **Y**
-- [ ] Regenerate limit per day? **3**
+- [x] Teacher preview/approve before student sees story? **Y**
+- [x] Regenerate limit per day? **3**
 
 ---
 
@@ -146,6 +146,6 @@ _[Screen 1: Game Start:
 
 | Name | Role | PRD approved | Date |
 |------|------|--------------|------|
-| | Engineering | ☐ | |
-|Tyson | Product/UX | X | 7/12/26|
-| | AI/Spike | ☐ | |
+| Josh Page | Engineering | X | 7/12/26 |
+| Tyson Small | Product/UX | X | 7/12/26 |
+| Gabriel Walker | AI/Spike | ☐ | |
