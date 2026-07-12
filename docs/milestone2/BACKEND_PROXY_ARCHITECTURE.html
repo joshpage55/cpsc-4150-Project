@@ -21,12 +21,12 @@
 <p>The Flutter app must never embed LLM or STT API keys. M2 requires generative-AI calls through a thin backend proxy. M2 proves this with the story spike; M3 will move Deepgram STT behind the same pattern.</p>
 
 <h2>2. Architecture</h2>
-<pre>Flutter app → HTTPS (no key) → Cloud Function generateStorySpike → GEMINI_API_KEY (secret) → Gemini mini-tier API</pre>
+<pre>Flutter app → HTTPS (no key) → Cloud Function generateStorySpike → OPENAI_API_KEY (secret) → OpenAI gpt-4o-mini</pre>
 <table>
 <tr><th>Layer</th><th>Responsibility</th></tr>
 <tr><td>Flutter</td><td>Sends Dolch word list; displays story</td></tr>
-<tr><td>Cloud Function</td><td>Prompt assembly, model allowlist, calls Gemini</td></tr>
-<tr><td>Secret store</td><td>firebase functions:secrets:set GEMINI_API_KEY</td></tr>
+<tr><td>Cloud Function</td><td>Prompt assembly, model allowlist, calls OpenAI</td></tr>
+<tr><td>Secret store</td><td>firebase functions:secrets:set OPENAI_API_KEY</td></tr>
 <tr><td>GitHub</td><td>Source only; .env gitignored</td></tr>
 </table>
 
@@ -43,7 +43,7 @@
 <p>Proxy lists allowed Dolch words, caps length (80–120 words), targets grade 1–2 reading level, returns plain text. See functions/storyPrompt.js.</p>
 
 <h2>5. Model guardrail</h2>
-<p>Mini-tier only (GEMINI_MODEL=gemini-2.0-flash-lite). Function rejects models outside allowlist.</p>
+<p>Mini-tier only (OPENAI_MODEL=gpt-4o-mini). Function rejects models outside allowlist.</p>
 
 <h2>6. GitHub safety</h2>
 <p>.gitignore blocks .env; .env.example has names only; review PRs for leaked keys; rotate if committed.</p>

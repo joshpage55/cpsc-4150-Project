@@ -4,12 +4,11 @@
 
 /** Mini-tier models allowed for course guardrails. */
 const ALLOWED_MODELS = new Set([
-  "gemini-2.0-flash-lite",
-  "gemini-2.0-flash-lite-001",
-  "gemini-1.5-flash-8b",
+  "gpt-4o-mini",
+  "gpt-4.1-mini",
 ]);
 
-const DEFAULT_MODEL = "gemini-2.0-flash-lite";
+const DEFAULT_MODEL = "gpt-4o-mini";
 
 /**
  * @param {string[]} dolchWords
@@ -44,7 +43,7 @@ function buildStoryPrompt(dolchWords, maxWords = 120) {
  * @return {string}
  */
 function resolveModel(model) {
-  const chosen = (model || process.env.GEMINI_MODEL || DEFAULT_MODEL).trim();
+  const chosen = (model || process.env.OPENAI_MODEL || DEFAULT_MODEL).trim();
   if (!ALLOWED_MODELS.has(chosen)) {
     const allowed = [...ALLOWED_MODELS].join(", ");
     throw new Error(
@@ -55,7 +54,7 @@ function resolveModel(model) {
 }
 
 /**
- * Call Gemini generateContent REST API.
+ * Call OpenAI chat completions API (mini-tier model).
  * @param {object} params
  * @param {string} params.apiKey
  * @param {string} params.model
@@ -63,41 +62,44 @@ function resolveModel(model) {
  * @param {string} params.user
  * @return {Promise<Object>}
  */
-async function generateStoryWithGemini({apiKey, model, system, user}) {
+async function generateStoryWithOpenAI({apiKey, model, system, user}) {
   const resolvedModel = resolveModel(model);
-  const url =
-    `https://generativelanguage.googleapis.com/v1beta/models/${resolvedModel}:generateContent?key=${apiKey}`;
+  const url = "https://api.openai.com/v1/chat/completions";
 
   const body = {
-    systemInstruction: {parts: [{text: system}]},
-    contents: [{role: "user", parts: [{text: user}]}],
-    generationConfig: {
-      temperature: 0.7,
-      maxOutputTokens: 512,
-    },
+    model: resolvedModel,
+    messages: [
+      {role: "system", content: system},
+      {role: "user", content: user},
+    ],
+    temperature: 0.7,
+    max_tokens: 512,
   };
 
   const res = await fetch(url, {
     method: "POST",
-    headers: {"Content-Type": "application/json"},
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${apiKey}`,
+    },
     body: JSON.stringify(body),
   });
 
   const data = await res.json();
   if (!res.ok) {
     const msg = data?.error?.message || res.statusText;
-    throw new Error(`Gemini API error: ${msg}`);
+    throw new Error(`OpenAI API error: ${msg}`);
   }
 
-  const story = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "";
+  const story = data?.choices?.[0]?.message?.content?.trim() || "";
   if (!story) {
-    throw new Error("Gemini returned empty story");
+    throw new Error("OpenAI returned empty story");
   }
 
   return {
     story,
     model: resolvedModel,
-    usage: data?.usageMetadata || null,
+    usage: data?.usage || null,
   };
 }
 
@@ -106,5 +108,5 @@ module.exports = {
   DEFAULT_MODEL,
   buildStoryPrompt,
   resolveModel,
-  generateStoryWithGemini,
+  generateStoryWithOpenAI,
 };

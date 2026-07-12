@@ -85,12 +85,12 @@ flutter emulators --launch Pixel_9_API_36
 flutter run -d emulator-5554
 
 # AI spike (local, key in .env — never commit .env)
-cp .env.example .env   # fill GEMINI_API_KEY from Canvas
+cp .env.example .env   # fill OPENAI_API_KEY from Canvas
 node scripts/m2_story_spike.mjs
 
 # Deploy proxy (after team Firebase + billing)
 cd functions && npm install
-firebase functions:secrets:set GEMINI_API_KEY
+firebase functions:secrets:set OPENAI_API_KEY
 firebase deploy --only functions:generateStorySpike
 ```
 

@@ -14,7 +14,7 @@ const functions = require("firebase-functions");
 // to be undefined).
 const admin = require("firebase-admin");
 const {GoogleAuth} = require("google-auth-library");
-const {buildStoryPrompt, generateStoryWithGemini} = require("./storyPrompt");
+const {buildStoryPrompt, generateStoryWithOpenAI} = require("./storyPrompt");
 // const logger = require("firebase-functions/logger");
 
 // For cost control, you can set the maximum number of containers that can be
@@ -140,14 +140,14 @@ exports.getPasswordPolicyForApp = functions.https.onCall(
 
 /**
  * M2 de-risk spike: Dolch words in → proxied mini-tier LLM → story out.
- * Key lives in GEMINI_API_KEY (Firebase secret / env). Never in Flutter.
+ * Key lives in OPENAI_API_KEY (Firebase secret / env). Never in Flutter.
  */
 exports.generateStorySpike = functions.https.onCall(async (data, _context) => {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
     throw new functions.https.HttpsError(
         "failed-precondition",
-        "GEMINI_API_KEY is not configured on the server",
+        "OPENAI_API_KEY is not configured on the server",
     );
   }
 
@@ -163,9 +163,9 @@ exports.generateStorySpike = functions.https.onCall(async (data, _context) => {
   const {system, user} = buildStoryPrompt(dolchWords, maxWords);
 
   try {
-    const result = await generateStoryWithGemini({
+    const result = await generateStoryWithOpenAI({
       apiKey,
-      model: process.env.GEMINI_MODEL,
+      model: process.env.OPENAI_MODEL,
       system,
       user,
     });

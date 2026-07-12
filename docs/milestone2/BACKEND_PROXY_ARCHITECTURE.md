@@ -20,12 +20,12 @@ Inherited ReadRight also had a **Deepgram key in Dart** (`deepgram_assessor.dart
 │  Flutter app    │ ───────────────────────▶│  Firebase Cloud Function │
 │  (Web/Android)  │   dolchWords, level     │  generateStorySpike      │
 └─────────────────┘                         └────────────┬─────────────┘
-                                                         │ GEMINI_API_KEY
+                                                         │ OPENAI_API_KEY
                                                          │ (secret / env)
                                                          ▼
                                               ┌──────────────────────────┐
-                                              │  Google Gemini API       │
-                                              │  mini-tier model only    │
+                                              │  OpenAI API              │
+                                              │  mini-tier (gpt-4o-mini) │
                                               └──────────────────────────┘
 ```
 
@@ -34,8 +34,8 @@ Inherited ReadRight also had a **Deepgram key in Dart** (`deepgram_assessor.dart
 | Layer | Responsibility |
 |-------|----------------|
 | **Flutter** | Sends word list + reading level; displays story text |
-| **Cloud Function** | Auth check (optional M3), prompt assembly, rate limit, calls Gemini |
-| **Secret store** | `firebase functions:secrets:set GEMINI_API_KEY` or local `.env` for spike script only |
+| **Cloud Function** | Auth check (optional M3), prompt assembly, rate limit, calls OpenAI |
+| **Secret store** | `firebase functions:secrets:set OPENAI_API_KEY` or local `.env` for spike script only |
 | **GitHub** | Source code only; `.env` gitignored |
 
 ---
@@ -44,7 +44,7 @@ Inherited ReadRight also had a **Deepgram key in Dart** (`deepgram_assessor.dart
 
 | Location | Allowed? | Why |
 |----------|----------|-----|
-| `functions` runtime secret (`GEMINI_API_KEY`) | **Yes** | Not in repo; injected at deploy |
+| `functions` runtime secret (`OPENAI_API_KEY`) | **Yes** | Not in repo; injected at deploy |
 | Developer laptop `.env` (gitignored) | **Yes (dev only)** | For `scripts/m2_story_spike.mjs` before deploy |
 | Canvas private announcement | **Yes** | Distribution to team only |
 | `lib/*.dart`, `functions/index.js` committed | **No** | Visible in git history forever |
@@ -69,7 +69,7 @@ See `functions/storyPrompt.js` and spike output in `docs/milestone2/spike/`.
 
 ## 5. Model guardrail
 
-**Mandated mini-tier only** — configured via `GEMINI_MODEL=gemini-2.0-flash-lite` (confirm exact name on Canvas).
+**Mandated mini-tier only** — configured via `OPENAI_MODEL=gpt-4o-mini` (confirm exact name on Canvas).
 
 The function **rejects** requests if env model is not in the allowlist (`functions/storyPrompt.js`).
 

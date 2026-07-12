@@ -6,7 +6,7 @@ Prove: **Dolch prompt → backend proxy → mini-tier model → story text**
 
 1. Team API key from **private Canvas announcement** (not class-wide post)
 2. Node 20+
-3. Copy `.env.example` → `.env` and set `GEMINI_API_KEY`
+3. Copy `.env.example` → `.env` and set `OPENAI_API_KEY`
 
 ## Run locally (before Firebase deploy)
 

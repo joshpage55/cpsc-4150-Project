@@ -38,9 +38,9 @@ I used the plan to run flutterfire configure on our team project when ready. I d
 
 ## Prompt 5
 
-How do I deploy the generateStorySpike function so the Gemini key lives only on the server? We have to use the mini-tier model from our Canvas announcement.
+How do I deploy the generateStorySpike function so the OpenAI key lives only on the server? We have to use the mini-tier model from our Canvas announcement.
 
-I used firebase functions:secrets:set for GEMINI_API_KEY and the allowlist in storyPrompt.js. I will not call the function from Flutter until M3; teammate runs scripts/m2_story_spike.mjs locally for M2 evidence.
+I used firebase functions:secrets:set for OPENAI_API_KEY and the allowlist in storyPrompt.js. I will not call the function from Flutter until M3; teammate runs scripts/m2_story_spike.mjs locally for M2 evidence.
 
 ---
 

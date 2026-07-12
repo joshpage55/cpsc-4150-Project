@@ -47,7 +47,7 @@ ReadRight helps children practice **Dolch sight-word pronunciation** with feedba
 ### Flow (M3 build; M2 spike proves backend)
 1. Student completes a Dolch level (or teacher assigns words)
 2. App sends **word list only** (no API key) to `generateStorySpike` Cloud Function
-3. Proxy builds Dolch-constrained prompt, calls **mini-tier model** (e.g. `gemini-2.0-flash-lite`)
+3. Proxy builds Dolch-constrained prompt, calls **mini-tier model** (`gpt-4o-mini`)
 4. Returns 80–120 word story; student reads aloud in existing practice pipeline
 
 ### Constraints (non-negotiable)

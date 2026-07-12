@@ -1,0 +1,36 @@
+{
+  "generatedAt": "2026-07-12T12:33:14.125Z",
+  "dolchWords": [
+    "a",
+    "and",
+    "big",
+    "blue",
+    "can",
+    "come",
+    "down",
+    "find",
+    "for",
+    "funny"
+  ],
+  "model": "gpt-4o-mini",
+  "story": "One day, a big blue bird can fly. The bird is funny. It can come down to the ground. \n\nA boy sees the bird. The boy wants to find the bird. He runs fast. \n\n\"Look at me!\" the boy shouts. \"I can see you!\" \n\nThe bird looks at the boy. It flaps its wings. \n\nThe boy laughs. \"You are so funny!\" \n\nThe bird hops on the grass. The boy sits down. They play a game. \n\nThe boy pretends to be a bird too. They both chirp and jump. \n\nThe sun is bright. It is a nice day. They are happy friends.",
+  "usage": {
+    "prompt_tokens": 109,
+    "completion_tokens": 137,
+    "total_tokens": 246,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "prompt": {
+    "system": "You write very short stories for children learning to read. Use ONLY simple words. Prefer words from the provided Dolch list. Do not use markdown, titles, or bullet points. Output plain story text only.",
+    "user": "Write a story of about 80-120 words for a first-grade reader. You MUST include several of these Dolch sight words naturally: a, and, big, blue, can, come, down, find, for, funny. Keep sentences short. No scary content."
+  }
+}

@@ -2,7 +2,7 @@
 /**
  * M2 AI story de-risk spike — local run (no Flutter).
  * Usage: node scripts/m2_story_spike.mjs
- * Requires .env with GEMINI_API_KEY (see .env.example).
+ * Requires .env with OPENAI_API_KEY (see .env.example).
  */
 
 import fs from "node:fs";
@@ -11,7 +11,7 @@ import {fileURLToPath} from "node:url";
 import {createRequire} from "node:module";
 
 const require = createRequire(import.meta.url);
-const {buildStoryPrompt, generateStoryWithGemini} = require("../functions/storyPrompt.js");
+const {buildStoryPrompt, generateStoryWithOpenAI} = require("../functions/storyPrompt.js");
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, "..");
@@ -38,9 +38,9 @@ const dolchWords = (process.env.DOLCH_WORDS || defaultWords.join(","))
     .map((w) => w.trim())
     .filter(Boolean);
 
-const apiKey = process.env.GEMINI_API_KEY;
+const apiKey = process.env.OPENAI_API_KEY;
 if (!apiKey) {
-  console.error("Missing GEMINI_API_KEY. Copy .env.example to .env and paste key from Canvas.");
+  console.error("Missing OPENAI_API_KEY. Copy .env.example to .env and paste key from Canvas.");
   process.exit(1);
 }
 
@@ -48,13 +48,13 @@ const {system, user} = buildStoryPrompt(dolchWords);
 
 console.log("M2 Story Spike");
 console.log("Dolch words:", dolchWords.join(", "));
-console.log("Model:", process.env.GEMINI_MODEL || "gemini-2.0-flash-lite");
+console.log("Model:", process.env.OPENAI_MODEL || "gpt-4o-mini");
 console.log("---");
 
 try {
-  const result = await generateStoryWithGemini({
+  const result = await generateStoryWithOpenAI({
     apiKey,
-    model: process.env.GEMINI_MODEL,
+    model: process.env.OPENAI_MODEL,
     system,
     user,
   });

@@ -57,7 +57,7 @@
 
 **What:** `firebase deploy --only functions` to `cpsc4150-readright`.
 
-**Result:** Blocked — project must upgrade to **Blaze** plan. After upgrade: set `GEMINI_API_KEY` secret and redeploy. Teammate with Canvas key runs local spike.
+**Result:** Blocked — project must upgrade to **Blaze** plan. After upgrade: set `OPENAI_API_KEY` secret and redeploy. Teammate with Canvas key runs local spike.
 
 ---
 

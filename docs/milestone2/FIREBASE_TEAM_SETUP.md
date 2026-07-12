@@ -24,7 +24,7 @@ Replaces `firebase_options.dart`, `google-services.json`, and iOS plist.
 ```bash
 cd functions && npm install
 firebase use cpsc4150-readright
-firebase functions:secrets:set GEMINI_API_KEY   # paste key from private Canvas post
+firebase functions:secrets:set OPENAI_API_KEY   # paste key from private Canvas post
 firebase deploy --only functions:generateStorySpike
 ```
 
@@ -32,7 +32,7 @@ firebase deploy --only functions:generateStorySpike
 
 ```bash
 cp .env.example .env
-# add GEMINI_API_KEY from Canvas
+# add OPENAI_API_KEY from Canvas
 node scripts/m2_story_spike.mjs
 ```
 
