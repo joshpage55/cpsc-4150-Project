@@ -8,6 +8,8 @@
  */
 
 const functions = require("firebase-functions");
+const {onCall, HttpsError} = require("firebase-functions/v2/https");
+const {defineSecret} = require("firebase-functions/params");
 // Use the official firebase-admin SDK to access admin.initializeApp().
 // The previous code attempted to read `admin` from `firebase-functions/https`
 // which does not export an `admin` object (causing initializeApp
@@ -138,49 +140,56 @@ exports.getPasswordPolicyForApp = functions.https.onCall(
     },
 );
 
+const openAiApiKey = defineSecret("OPENAI_API_KEY");
+
 /**
  * M2 de-risk spike: Dolch words in → proxied mini-tier LLM → story out.
  * Key lives in OPENAI_API_KEY (Firebase secret / env). Never in Flutter.
  */
-exports.generateStorySpike = functions.https.onCall(async (data, _context) => {
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    throw new functions.https.HttpsError(
-        "failed-precondition",
-        "OPENAI_API_KEY is not configured on the server",
-    );
-  }
+exports.generateStorySpike = onCall(
+    {secrets: [openAiApiKey], maxInstances: 5},
+    async (request) => {
+      const apiKey = openAiApiKey.value();
+      if (!apiKey) {
+        throw new HttpsError(
+            "failed-precondition",
+            "OPENAI_API_KEY is not configured on the server",
+        );
+      }
 
-  const dolchWords = data?.dolchWords;
-  if (!Array.isArray(dolchWords) || dolchWords.length === 0) {
-    throw new functions.https.HttpsError(
-        "invalid-argument",
-        "dolchWords must be a non-empty array of strings",
-    );
-  }
+      const data = request.data;
+      const dolchWords = data?.dolchWords;
+      if (!Array.isArray(dolchWords) || dolchWords.length === 0) {
+        throw new HttpsError(
+            "invalid-argument",
+            "dolchWords must be a non-empty array of strings",
+        );
+      }
 
-  const maxWords = typeof data?.maxWords === "number" ? data.maxWords : 120;
-  const {system, user} = buildStoryPrompt(dolchWords, maxWords);
+      const maxWords = typeof data?.maxWords === "number" ? data.maxWords : 120;
+      const {system, user} = buildStoryPrompt(dolchWords, maxWords);
 
-  try {
-    const result = await generateStoryWithOpenAI({
-      apiKey,
-      model: process.env.OPENAI_MODEL,
-      system,
-      user,
-    });
-    return {
-      story: result.story,
-      model: result.model,
-      dolchWords,
-      usage: result.usage,
-      promptPreview: {system, user},
-    };
-  } catch (err) {
-    console.error("generateStorySpike failed:", err);
-    throw new functions.https.HttpsError(
-        "internal",
-        err.message || "Story generation failed",
-    );
-  }
-});
+      try {
+        const result = await generateStoryWithOpenAI({
+          apiKey,
+          model: process.env.OPENAI_MODEL,
+          system,
+          user,
+        });
+        return {
+          story: result.story,
+          model: result.model,
+          dolchWords,
+          usage: result.usage,
+          promptPreview: {system, user},
+          via: "firebase-proxy",
+        };
+      } catch (err) {
+        console.error("generateStorySpike failed:", err);
+        throw new HttpsError(
+            "internal",
+            err.message || "Story generation failed",
+        );
+      }
+    },
+);

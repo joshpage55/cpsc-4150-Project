@@ -55,9 +55,17 @@
 
 ## 2026-07-12 — Deploy generateStorySpike
 
-**What:** `firebase deploy --only functions:generateStorySpike` to `cpsc4150-readright`.
+**What:** Set `OPENAI_API_KEY` Firebase secret; migrated function to v2 `onCall` with `defineSecret`; deployed to `cpsc4150-readright` (`us-central1`).
 
-**Result:** Not deployed — requires Blaze plan. Local spike via `node scripts/m2_story_spike.mjs` succeeded; evidence in `docs/milestone2/spike/spike_result_latest.json`. Deploy optional for M2.
+**Result:** Done. Callable endpoint: `https://us-central1-cpsc4150-readright.cloudfunctions.net/generateStorySpike`.
+
+---
+
+## 2026-07-12 — Proxy spike (deployed function)
+
+**What:** `node scripts/m2_call_story_proxy.mjs` — Dolch words → deployed Cloud Function → `gpt-4o-mini` → story.
+
+**Result:** Done. Evidence in `docs/milestone2/spike/spike_result_via_proxy.json`. Key never left server; not in repo.
 
 ---
 

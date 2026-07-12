@@ -1,0 +1,38 @@
+{
+  "generatedAt": "2026-07-12T22:35:09.036Z",
+  "via": "firebase-proxy",
+  "endpoint": "https://us-central1-cpsc4150-readright.cloudfunctions.net/generateStorySpike",
+  "dolchWords": [
+    "a",
+    "and",
+    "big",
+    "blue",
+    "can",
+    "come",
+    "down",
+    "find",
+    "for",
+    "funny"
+  ],
+  "model": "gpt-4o-mini",
+  "story": "Sam has a big dog. The dog's name is Max. Max is blue and funny. One day, Sam and Max go to the park. Sam can run fast. Max can jump high. They play a game. Sam says, \"Can you find the ball?\" Max runs down the hill. He looks for the ball. Sam laughs. Max comes back with a stick. \"That is not the ball!\" says Sam. Max wags his tail. \"Let's play again!\" Sam says. They have fun all day. The sun is big and bright. It is a good day for Sam and Max.",
+  "usage": {
+    "prompt_tokens": 109,
+    "completion_tokens": 123,
+    "total_tokens": 232,
+    "prompt_tokens_details": {
+      "cached_tokens": 0,
+      "audio_tokens": 0
+    },
+    "completion_tokens_details": {
+      "reasoning_tokens": 0,
+      "audio_tokens": 0,
+      "accepted_prediction_tokens": 0,
+      "rejected_prediction_tokens": 0
+    }
+  },
+  "prompt": {
+    "system": "You write very short stories for children learning to read. Use ONLY simple words. Prefer words from the provided Dolch list. Do not use markdown, titles, or bullet points. Output plain story text only.",
+    "user": "Write a story of about 80-120 words for a first-grade reader. You MUST include several of these Dolch sight words naturally: a, and, big, blue, can, come, down, find, for, funny. Keep sentences short. No scary content."
+  }
+}
