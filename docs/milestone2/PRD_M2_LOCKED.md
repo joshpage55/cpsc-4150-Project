@@ -1,6 +1,6 @@
 # ReadRight — Milestone 2 Locked Plan (PRD-Style Change Proposal)
 
-**Team:** _[Names]_  
+**Team:** _[Josh Page, Tyson Small, Gabriel Walker]_  
 **Status:** DRAFT — lock by M2 submission  
 **Baseline:** Inherited [readright](https://github.com/ztraboo/readright) @ Release 1.0  
 **M3 measures against this document.**
@@ -62,8 +62,8 @@ ReadRight helps children practice **Dolch sight-word pronunciation** with feedba
 - [ ] Model name + prompt logged in engineering log
 
 ### Open decisions (Person B to finalize)
-- [ ] Teacher preview/approve before student sees story? **Y / N**
-- [ ] Regenerate limit per day? **\_**
+- [ ] Teacher preview/approve before student sees story? **Y**
+- [ ] Regenerate limit per day? **3**
 
 ---
 
@@ -71,7 +71,7 @@ ReadRight helps children practice **Dolch sight-word pronunciation** with feedba
 
 **Pick at least one for M3** (team decision — check one):
 
-- [ ] **Game 1: Word Match** — hear word → tap correct tile among 4 Dolch peers  
+- [X] **Game 1: Word Match** — hear word → tap correct tile among 4 Dolch peers  
 - [ ] **Game 2: Sentence Fill** — tap missing Dolch word in a sentence from seed data  
 - [ ] **Game 3: Speed Read** — timed flash of level words, streak counter  
 
@@ -81,7 +81,27 @@ ReadRight helps children practice **Dolch sight-word pronunciation** with feedba
 - Kid-safe: no external links, no chat
 
 ### Person B: add wireframe notes or Figma link
-_[Link or embed description]_
+_[Screen 1: Game Start:
+    -Title: Word Match
+    -Display current Dolch level (e.g., Pre-Primer).
+    -Brief instructions: "Tap the word you hear."
+    -Large Start Game button.
+ Screen 2: Gameplay
+    -Progress indicator at the top (e.g., Question 3 of 10).
+    -Star counter in the upper-right corner.
+    Optional speaker icon to replay the target word's pronunciation.
+    Display the target word (or audio prompt only, depending on implementation).
+    Four large answer buttons arranged in a 2×2 grid.
+    Correct answer and three randomly selected Dolch words from the same level.
+    When an answer is selected:
+    Correct: button briefly turns green, display "Correct!", award one star.
+    Incorrect: button briefly turns red, display "Try Again!", then allow another attempt or advance based on game settings.
+    Next button appears after the question is completed.
+ Screen 3 – Results
+    -Display final score (e.g., 8/10 Correct).
+    -Show total stars earned.
+    -Display encouraging message based on performance (e.g., "Great Job!" or "Keep Practicing!").
+    Buttons: Play Again, Return to Home]_
 
 ---
 
@@ -103,9 +123,9 @@ _[Link or embed description]_
 | Student details | Teacher | Audio playback unclear if retention off | Badge for retention + playback help |
 
 ### Top 3 M3 UX priorities
-1. _[Team fill]_  
-2. _[Team fill]_  
-3. _[Team fill]_  
+1. _[Make navigation simpler for younger users with large buttons, icons, and clear prompts]_  
+2. _[Ensure AI-generated stories are easy to access and written at an appropriate reading level for Grade 1–2.]_  
+3. _[Provide immediate, encouraging feedback after every activity instead of only showing a score.]_  
 
 ---
 
@@ -127,5 +147,5 @@ _[Link or embed description]_
 | Name | Role | PRD approved | Date |
 |------|------|--------------|------|
 | | Engineering | ☐ | |
-| | Product/UX | ☐ | |
+|Tyson | Product/UX | X | 7/12/26|
 | | AI/Spike | ☐ | |
