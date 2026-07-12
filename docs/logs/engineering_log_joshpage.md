@@ -79,6 +79,6 @@
 
 ## 2026-07-12 — Video + PDF (Josh portion)
 
-**What:** `VIDEO_SCRIPT_JOSH.md` written. Export PDF from `BACKEND_PROXY_ARCHITECTURE.html` (Chrome → Print → Save as PDF).
+**What:** Export PDF from `BACKEND_PROXY_ARCHITECTURE.md` for Canvas submission.
 
 **Result:** Script done. Still need to **record** my video segment and **review PDF with team** before Canvas submit.

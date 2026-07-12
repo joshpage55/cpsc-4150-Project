@@ -45,7 +45,7 @@ Inherited ReadRight also had a **Deepgram key in Dart** (`deepgram_assessor.dart
 | Location | Allowed? | Why |
 |----------|----------|-----|
 | `functions` runtime secret (`OPENAI_API_KEY`) | **Yes** | Not in repo; injected at deploy |
-| Developer laptop `.env` (gitignored) | **Yes (dev only)** | For `scripts/m2_story_spike.mjs` before deploy |
+| Developer laptop `.env` (gitignored) | **No (M2)** | Key lives in Firebase secret only for deployed proxy |
 | Canvas private announcement | **Yes** | Distribution to team only |
 | `lib/*.dart`, `functions/index.js` committed | **No** | Visible in git history forever |
 | GitHub Actions secrets | **Yes (CI)** | If we add automated spike tests later |
@@ -84,14 +84,14 @@ The function **rejects** requests if env model is not in the allowlist (`functio
 
 ---
 
-## 7. Local spike vs production
+## 7. M2 spike vs M3 production
 
 | Mode | Command | Key source |
 |------|---------|------------|
-| Local spike | `node scripts/m2_story_spike.mjs` | `.env` (gitignored) |
-| Production | `firebase deploy --only functions:generateStorySpike` | Firebase secret |
+| M2 proxy spike | `node scripts/m2_call_story_proxy.mjs` | Firebase secret on `generateStorySpike` |
+| M3 production | Flutter → callable `generateStorySpike` | Firebase secret |
 
-Local spike proves the path before Flutter integration in M3.
+Evidence: `docs/milestone2/spike/spike_result_via_proxy.json`
 
 ---
 
