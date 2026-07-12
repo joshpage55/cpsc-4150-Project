@@ -47,30 +47,30 @@
 
 ## 2026-07-12 — Team Firebase
 
-**What:** Created Firebase project `cpsc4150-readright`; updated `.firebaserc`; wrote `FIREBASE_TEAM_SETUP.md`.
+**What:** Created `cpsc4150-readright`; ran `flutterfire configure` for Android, iOS, Web; updated `firebase_options.dart` and platform config files.
 
-**Result:** Project created. Teammates need Editor invites. Flutter client still uses inherited config until `flutterfire configure`.
+**Result:** Done. Invite teammates as Editors in Firebase Console.
 
 ---
 
 ## 2026-07-12 — Deploy generateStorySpike
 
-**What:** `firebase deploy --only functions` to `cpsc4150-readright`.
+**What:** `firebase deploy --only functions:generateStorySpike` to `cpsc4150-readright`.
 
-**Result:** Blocked — project must upgrade to **Blaze** plan. After upgrade: set `OPENAI_API_KEY` secret and redeploy. Teammate with Canvas key runs local spike.
+**Result:** Not deployed — requires Blaze plan. Local spike via `node scripts/m2_story_spike.mjs` succeeded; evidence in `docs/milestone2/spike/spike_result_latest.json`. Deploy optional for M2.
 
 ---
 
 ## 2026-07-12 — Logs
 
-**What:** Finished `prompt_log_joshpage.md` and this engineering log.
+**What:** `prompt_log_joshpage.md` and this engineering log.
 
 **Result:** Done.
 
 ---
 
-## 2026-07-12 — Video + PDF
+## 2026-07-12 — Video + PDF (Josh portion)
 
-**What:** `VIDEO_SCRIPT_JOSH.md` for my segment. PDF from `BACKEND_PROXY_ARCHITECTURE.md`.
+**What:** `VIDEO_SCRIPT_JOSH.md` written. Export PDF from `BACKEND_PROXY_ARCHITECTURE.html` (Chrome → Print → Save as PDF).
 
-**Result:** Script done. PDF in `docs/milestone2/` if generated. Full team Kaltura video and team PDF review still needed.
+**Result:** Script done. Still need to **record** my video segment and **review PDF with team** before Canvas submit.
