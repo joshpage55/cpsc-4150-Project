@@ -10,14 +10,14 @@
 **What:** An error would consistently occur which would prevent the launching of the app. Properly configured
 android SDK.
 
-**Result:** The app launched properly and took several minutes first time running `flutter run`
+**Result:** The app launched properly and took several minutes first time running `flutter run`.
 
 ## 2026-07-12 - M2 Chrome Launch
 
 **What:** Chrome did not launch properly after initially pulling, creating venv environment `python -m venv venv`,
 running `flutter pub get` and running `pip install -r requirements`. The solution was to run `pip install -r scripts/requirements.txt`.
 
-**Result:** The app launched properly
+**Result:** The app launched properly.
 
 ## 2026-07-12 - M2 Windows Launch
 
@@ -30,3 +30,15 @@ running `flutter pub get` and running `pip install -r requirements`. The solutio
 **What:** While becoming familiarized with the repo, I skimmed the code before interacting with it.
 
 **Result:** I understood a greater portion of the project.
+
+## 2026-07-12 - M2 Created the .env file that stores the openai api key
+
+**What:** I created the file to store the openai api key.
+
+**Result:** I am able to access the api key.
+
+## 2026-08-12 - M2 Completed My Engineering Log
+
+**What:** Completed my engineering log.
+
+**Result:** A complete log tracking progress in the progress of the project.
