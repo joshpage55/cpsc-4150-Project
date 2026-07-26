@@ -88,10 +88,11 @@ class _StudentWordFeedbackPageState extends State<StudentWordFeedbackPage> {
         });
       }
 
-      // Normalize passing threshold score to star rating.
-      _normalizeSTTScoreToStars(rawScore: AppScoring.passingThreshold).then((normalized) {
+      // Normalize passing threshold score to star rating (level-aware).
+      final passBar = AppScoring.passingThresholdForLevel(wordLevel);
+      _normalizeSTTScoreToStars(rawScore: passBar).then((normalized) {
         setState(() {
-          debugPrint("StudentWordFeedbackPage: Passing threshold STT score of ${AppScoring.passingThreshold} is represented as ${normalized} stars.");
+          debugPrint("StudentWordFeedbackPage: Passing threshold STT score of $passBar is represented as ${normalized} stars.");
           _passingThresholdStars = normalized;
         });
       });
@@ -418,6 +419,8 @@ class _StudentWordFeedbackPageState extends State<StudentWordFeedbackPage> {
               _buildSentenceSection(),
               const SizedBox(height: 15),
               _buildStarRating(),
+              const SizedBox(height: 12),
+              _buildPracticeTip(),
               // _buildTranscriptSection(),
               const SizedBox(height: 15),
               //_buildInstructions(),
@@ -543,6 +546,30 @@ class _StudentWordFeedbackPageState extends State<StudentWordFeedbackPage> {
         'assets/mascot/yeti_happy.svg',
         semanticsLabel: 'Yeti Happy',
         fit: BoxFit.contain,
+      ),
+    );
+  }
+
+  /// One actionable kid tip (DMMT) — not just a score.
+  Widget _buildPracticeTip() {
+    final tip = AppScoring.kidHintForAttempt(
+      word: practiceWord?.text ?? '',
+      rawScore: _attemptResult?.score ?? 0.0,
+      level: wordLevel,
+      transcript: _attemptResult?.recognizedText,
+    );
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 24),
+      child: Text(
+        tip,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          fontFamily: 'SF Compact Display',
+          fontSize: 18,
+          fontWeight: FontWeight.w500,
+          color: Colors.black87,
+          height: 1.25,
+        ),
       ),
     );
   }

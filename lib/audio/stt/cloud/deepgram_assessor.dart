@@ -1,32 +1,32 @@
-import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:flutter/cupertino.dart';
-import 'package:http/http.dart' as http;
+import 'package:cloud_functions/cloud_functions.dart';
+import 'package:flutter/foundation.dart';
 import 'package:readright/audio/stt/pronunciation_assessor.dart';
 import 'package:path/path.dart' as p;
 import 'package:string_similarity/string_similarity.dart';
 
 import '../on_device/cmu_map.dart';
 
-/// Cloud STT Model (https://deepgram.com/learn/introducing-nova-3-speech-to-text-api).
-
-/// Implementations should accept WAV bytes or PCM as required by the vendor.
+/// Cloud STT via Firebase `transcribeAudio` proxy.
+///
+/// Deepgram API key lives only in the Cloud Function secret — never in this
+/// Flutter binary / git history (stripped in M3).
 class DeepgramAssessor implements PronunciationAssessor {
   final String audioPath;
   final String practiceWord;
+  final FirebaseFunctions _functions;
 
-  // TODO secure api key in storage - firebase security?
-  final String apiKey = '4ec2df06384b70fc6d37f3cc1179238f0f67c5c0';
   late String extension = '';
-
 
   DeepgramAssessor({
     required this.audioPath,
     required this.practiceWord,
-  });
+    FirebaseFunctions? functions,
+  }) : _functions = functions ??
+            FirebaseFunctions.instanceFor(region: 'us-central1');
 
   @override
   Future<AssessmentResult> assess({
@@ -46,20 +46,32 @@ class DeepgramAssessor implements PronunciationAssessor {
       );
     }
 
-    final uri = Uri.parse('https://api.deepgram.com/v1/listen');
-    final headers = {
-      'Authorization': 'Token $apiKey',
-      'Content-Type': 'audio/$extension',
-    };
+    // Prefer encoded file on disk (WAV/AAC) over raw PCM buffer from caller.
+    Uint8List payload = audioBytes;
+    if (!kIsWeb && audioPath.isNotEmpty) {
+      try {
+        final file = File(audioPath);
+        if (await file.exists()) {
+          payload = await file.readAsBytes();
+        }
+      } catch (e) {
+        debugPrint('DeepgramAssessor: could not read $audioPath, using buffer: $e');
+      }
+    }
+
+    final mimeType = _mimeForExtension(extension);
     try {
-      final audioBytes = await File(audioPath).readAsBytes();
-      final response = await http.post(uri, headers: headers, body: audioBytes);
-      final data = jsonDecode(response.body);
+      final callable = _functions.httpsCallable('transcribeAudio');
+      final response = await callable.call(<String, dynamic>{
+        'audioBase64': base64Encode(payload),
+        'mimeType': mimeType,
+      });
 
-      final transcript = data['results']?['channels']?[0]?['alternatives']?[0]?['transcript'] ?? '';
-      final modelConfidence = data['results']?['channels']?[0]?['alternatives']?[0]?['confidence'] ?? 0.0;
+      final data = Map<String, dynamic>.from(response.data as Map);
+      final transcript = (data['transcript'] as String?) ?? '';
+      final modelConfidence = (data['confidence'] as num?)?.toDouble() ?? 0.0;
 
-      debugPrint("transcript: $transcript");
+      debugPrint('transcript (via proxy): $transcript');
       return AssessmentResult(
         recognizedText: transcript,
         confidence: modelConfidence,
@@ -67,130 +79,110 @@ class DeepgramAssessor implements PronunciationAssessor {
         details: {
           'timestamp': DateTime.now().toIso8601String(),
           'format': extension,
-          'bytes': audioBytes.length,
-          'wordCount': transcript
-              .trim()
-              .split(RegExp(r'\s+'))
-              .length,
-          'provider': 'Deepgram Nova-3',
+          'bytes': payload.length,
+          'wordCount': transcript.trim().isEmpty
+              ? 0
+              : transcript.trim().split(RegExp(r'\s+')).length,
+          'provider': data['provider'] ?? 'Deepgram Nova-3',
+          'via': data['via'] ?? 'firebase-proxy',
           'finalized': true,
         },
       );
     } catch (e, st) {
-      debugPrint('DeepgramAssessor REST error: $e\n$st');
+      debugPrint('DeepgramAssessor proxy error: $e\n$st');
       return AssessmentResult(
         recognizedText: '',
         confidence: 0.0,
         score: 0.0,
-        details: {'error': e.toString()},
+        details: {'error': e.toString(), 'via': 'firebase-proxy'},
       );
     }
   }
 
-  double setScore(String transcript, String referenceWord){
+  String _mimeForExtension(String ext) {
+    switch (ext.toLowerCase()) {
+      case '.wav':
+        return 'audio/wav';
+      case '.mp3':
+        return 'audio/mpeg';
+      case '.ogg':
+        return 'audio/ogg';
+      case '.webm':
+        return 'audio/webm';
+      case '.m4a':
+      case '.aac':
+        return 'audio/mp4';
+      default:
+        return 'audio/wav';
+    }
+  }
+
+  double setScore(String transcript, String referenceWord) {
     double score = 0.0;
     double jaroScore = 0.0;
     double cmuScore = 0.0;
 
-    // Normalize reference text and transcript prior to analysis
-    String normReference = normalize(referenceWord);
-    String normTranscript = normalize(transcript);
+    final normReference = normalize(referenceWord);
+    final normTranscript = normalize(transcript);
 
-    // Compute Jaro-Winkler score between 0 and 1
-
-    // Analyze each word individually to avoid variability in transcript length
-    List<String> words = normTranscript.split(' ');
+    final words = normTranscript.split(' ').where((w) => w.isNotEmpty).toList();
     double bestScore = 0.0;
 
-    for (String word in words) {
+    for (final word in words) {
       jaroScore = StringSimilarity.compareTwoStrings(normReference, word);
-      debugPrint("word: $word \njaroscore: $jaroScore, \nbestscore: $bestScore");
       if (jaroScore > bestScore) {
         bestScore = jaroScore;
       }
     }
     jaroScore = bestScore;
 
-    // Omit CMUDict assessment if the correct word was spoken
-    // CMUDict identifies the difference in phonetic pattern between different words
-    // Using the following algorithm on two of the same word is redundant
-    if (jaroScore == 1.0){
+    if (jaroScore == 1.0) {
       cmuScore = 1.0;
-    }
-    else {
-      List<String>? expectedPhonemes = cmuDict[normReference];
-      if (expectedPhonemes == null){
-        debugPrint("expectedPhonemes is NULL");
-      }
-      else {
+    } else {
+      final expectedPhonemes = cmuDict[normReference];
+      if (expectedPhonemes != null) {
         bestScore = 0.0;
-        debugPrint("expectedPhonemes: $expectedPhonemes");
-        for (String word in words) {
-          List<String>? wordPhonemes = cmuDict[word];
-          if (wordPhonemes == null){
-            debugPrint("wordPhonemes is NULL for word: $word");
-          }
-          else {
-            debugPrint("comparing word, $word ($wordPhonemes) with $referenceWord ($expectedPhonemes)");
-            cmuScore = comparePhonemes(expectedPhonemes, wordPhonemes);
-            debugPrint("CMUScore = $cmuScore");
-            if (cmuScore > bestScore) {
-              bestScore = cmuScore;
-            }
+        for (final word in words) {
+          final wordPhonemes = cmuDict[word];
+          if (wordPhonemes == null) continue;
+          cmuScore = comparePhonemes(expectedPhonemes, wordPhonemes);
+          if (cmuScore > bestScore) {
+            bestScore = cmuScore;
           }
         }
         cmuScore = bestScore;
-        debugPrint("final cmuScore: $cmuScore");
       }
     }
 
-
-    // Weigh phonetic pattern higher
-    double cmuWeight = 0.7;
-    double jaroWeight = 0.3;
-    score = (cmuScore * cmuWeight) + (jaroScore* jaroWeight);
+    const cmuWeight = 0.7;
+    const jaroWeight = 0.3;
+    score = (cmuScore * cmuWeight) + (jaroScore * jaroWeight);
     return score;
   }
 
-  // helper to normalize transcript and reference word
-  // Drop digits, punctuation, and ensure lower case
   String normalize(String subject) {
-    String normalized = subject.toLowerCase();
-    normalized = normalized.replaceAll(RegExp(r'[0-9\p{P}]', unicode: true), '');
-    normalized = normalized.trim();
-    return normalized;
+    var normalized = subject.toLowerCase();
+    normalized =
+        normalized.replaceAll(RegExp(r'[0-9\p{P}]', unicode: true), '');
+    return normalized.trim();
   }
 
-  // Helper method to compare to lists of phonemes
-  double comparePhonemes(List<String> refPhonemes, List<String> actualPhonemes){
-    double score = 0.0;
-
-    // compare entries with Levenshtein
-    // final refStr = refPhonemes.join(' ');
-    // final actualStr = actualPhonemes.join(' ');
-    // int distance = Levenshtein.distance(refStr, actualStr);
-    int distance = levenshteinList(refPhonemes, actualPhonemes);
-    final maxLen = refPhonemes.length > actualPhonemes.length ? refPhonemes.length : actualPhonemes.length;
-
-    if (maxLen == 0){
-      debugPrint("Phoneme lists are empty");
-      return 0.0;
-    }
-
-    score = 1.0 - (distance/maxLen);
-
-    return score;
+  double comparePhonemes(List<String> refPhonemes, List<String> actualPhonemes) {
+    final distance = levenshteinList(refPhonemes, actualPhonemes);
+    final maxLen = refPhonemes.length > actualPhonemes.length
+        ? refPhonemes.length
+        : actualPhonemes.length;
+    if (maxLen == 0) return 0.0;
+    return 1.0 - (distance / maxLen);
   }
 
-  // custom Levenshtein implementation to compare lists
-  // returns number of incorrect List items
-  int levenshteinList<T>(List<String> expectedPhonemes, List<String> actualPhonemes) {
+  int levenshteinList(List<String> expectedPhonemes, List<String> actualPhonemes) {
     final expectedLength = expectedPhonemes.length;
     final actualLength = actualPhonemes.length;
 
     final matrix = List.generate(
       expectedLength + 1,
-          (_) => List<int>.filled(actualLength + 1, 0),
+      (_) => List<int>.filled(actualLength + 1, 0),
     );
 
     for (var i = 0; i <= expectedLength; i++) {
@@ -200,12 +192,10 @@ class DeepgramAssessor implements PronunciationAssessor {
       matrix[0][j] = j;
     }
 
-    // Fill the matrix
     for (var i = 1; i <= expectedLength; i++) {
       for (var j = 1; j <= actualLength; j++) {
         final substitutionCost =
-        expectedPhonemes[i - 1] == actualPhonemes[j - 1] ? 0 : 1;
-
+            expectedPhonemes[i - 1] == actualPhonemes[j - 1] ? 0 : 1;
         matrix[i][j] = [
           matrix[i - 1][j] + 1,
           matrix[i][j - 1] + 1,
@@ -215,5 +205,4 @@ class DeepgramAssessor implements PronunciationAssessor {
     }
     return matrix[expectedLength][actualLength];
   }
-
 }

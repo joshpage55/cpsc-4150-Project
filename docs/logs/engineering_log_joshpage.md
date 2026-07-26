@@ -1,6 +1,6 @@
 # Engineering Log — Josh Page
 
-**Course:** CPSC 4150 · M2  
+**Course:** CPSC 4150 · M3  
 **Repo:** `joshpage55/cpsc-4150-Project`
 
 ---
@@ -82,3 +82,36 @@
 **What:** Export PDF from `BACKEND_PROXY_ARCHITECTURE.md` for Canvas submission.
 
 **Result:** Script done. Still need to **record** my video segment and **review PDF with team** before Canvas submit.
+
+---
+
+## 2026-07-26 — M3 Story Builder production path
+
+**What:** Added `generateStory` (teacher-only), `approveStory`, draft Firestore `stories` docs, 3/day regen counters, stronger prompts + `contentSafety.js`, token logging + soft spend alerts.
+
+**Result:** Code complete in `functions/`. Needs deploy to `cpsc4150-readright` before live demo.
+
+---
+
+## 2026-07-26 — M3 STT proxy + key removal
+
+**What:** Added `transcribeAudio` Cloud Function; rewrote `DeepgramAssessor` to call the proxy with base64 audio; removed hardcoded Deepgram key from Flutter.
+
+**Result:** Client no longer embeds STT key. Requires Firebase secret `DEEPGRAM_API_KEY` + function deploy.
+
+---
+
+## 2026-07-26 — Scoring + Word Match engine + StoryService
+
+**What:** Level-aware pass thresholds + kid tip on feedback; `WordMatchEngine` for Person 2 UI; Flutter `StoryService` / `StoryRepository` / `StoryModel`.
+
+**Result:** Core logic ready for teammates to skin. Smoke tests in `test/unit/m3_person1_smoke_test.dart`.
+
+---
+
+## 2026-07-26 — Deploy M3 functions
+
+**What:** Deployed `generateStory`, `approveStory`, `transcribeAudio`, updated `generateStorySpike` to `cpsc4150-readright`.
+
+**Result:** Functions live in `us-central1`. Cloud STT still needs `DEEPGRAM_API_KEY` set on the function env/secret before proxy transcription works; practice falls back to Cheetah until then.
+

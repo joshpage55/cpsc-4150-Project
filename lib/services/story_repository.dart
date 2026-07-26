@@ -1,0 +1,65 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:readright/models/story_model.dart';
+
+/// Firestore access for AI Story Builder documents.
+///
+/// Collection: `stories`
+class StoryRepository {
+  StoryRepository._internal({FirebaseFirestore? firestore, FirebaseAuth? auth})
+      : _db = firestore ?? FirebaseFirestore.instance,
+        _auth = auth ?? FirebaseAuth.instance;
+
+  factory StoryRepository({FirebaseFirestore? firestore, FirebaseAuth? auth}) =>
+      StoryRepository._internal(firestore: firestore, auth: auth);
+
+  StoryRepository.withFirestoreAndAuth(FirebaseFirestore firestore, FirebaseAuth auth)
+      : _db = firestore,
+        _auth = auth;
+
+  final FirebaseFirestore _db;
+  final FirebaseAuth _auth;
+
+  CollectionReference<Map<String, dynamic>> get _col =>
+      _db.collection('stories');
+
+  Future<StoryModel?> fetchById(String id) async {
+    final doc = await _col.doc(id).get();
+    if (!doc.exists || doc.data() == null) return null;
+    return StoryModel.fromJson({...doc.data()!, 'id': doc.id});
+  }
+
+  /// Drafts for the signed-in teacher (Person 2 preview queue).
+  Future<List<StoryModel>> fetchDraftsForTeacher(String teacherId) async {
+    final q = await _col
+        .where('teacherId', isEqualTo: teacherId)
+        .where('status', isEqualTo: StoryStatus.draft.wireName)
+        .get();
+    return q.docs
+        .map((d) => StoryModel.fromJson({...d.data(), 'id': d.id}))
+        .toList();
+  }
+
+  /// Approved stories visible to a student.
+  Future<List<StoryModel>> fetchApprovedForStudent(String studentId) async {
+    final q = await _col
+        .where('studentId', isEqualTo: studentId)
+        .where('status', isEqualTo: StoryStatus.approved.wireName)
+        .get();
+    return q.docs
+        .map((d) => StoryModel.fromJson({...d.data(), 'id': d.id}))
+        .toList();
+  }
+
+  /// Remaining regenerations today for [teacherId] (PRD: 3/day).
+  Future<int> remainingRegensToday(String teacherId, {int maxPerDay = 3}) async {
+    final dayKey = DateTime.now().toUtc().toIso8601String().substring(0, 10);
+    final doc =
+        await _db.collection('story_regen_counters').doc('${teacherId}_$dayKey').get();
+    final count = (doc.data()?['count'] as int?) ?? 0;
+    final remaining = maxPerDay - count;
+    return remaining < 0 ? 0 : remaining;
+  }
+
+  String? get currentUid => _auth.currentUser?.uid;
+}

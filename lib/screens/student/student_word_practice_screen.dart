@@ -499,29 +499,40 @@ class _StudentWordPracticePageState extends State<StudentWordPracticePage>
         _deepgramAssessor = DeepgramAssessor(audioPath: uploadPath!, practiceWord: practiceWord!.text);
         attemptResult = await _deepgramAssessor!.assess(referenceText: practiceWord!.text, audioBytes: pcmBytes, locale: 'en-US');
         final recognizedText = attemptResult?.recognizedText ?? '';
-        if (mounted && recognizedText.isNotEmpty) {
+        final details = attemptResult?.details;
+        final proxyFailed = details != null && details['error'] != null;
+        if (proxyFailed || recognizedText.isEmpty) {
+          debugPrint(
+            'StudentWordPracticePage: Cloud STT proxy empty/failed '
+            '(${details?['error']}); falling back to Cheetah',
+          );
+          attemptResult = await _cheetahAssessor.assess(
+            referenceText: practiceWord!.text,
+            audioBytes: pcmBytes,
+            locale: 'en-US',
+          );
+        }
+        final finalText = attemptResult?.recognizedText ?? '';
+        if (mounted && finalText.isNotEmpty) {
           setState(() {
-            _lastTranscript = recognizedText;
-            debugPrint("StudentWordPracticePage: Deepgram recognized text: $_lastTranscript");
+            _lastTranscript = finalText;
+            debugPrint("StudentWordPracticePage: STT recognized text: $_lastTranscript");
           });
         }
       } catch (e, st) {
-        if (e is SocketException) {
-          debugPrint("StudentWordPracticePage: No internet connection, falling back to local STT, Cheetah");
-          try {
-            attemptResult = await _cheetahAssessor.assess(referenceText: practiceWord!.text, audioBytes: pcmBytes, locale: 'en-US');
-            final recognizedText = attemptResult?.recognizedText ?? '';
-            if (mounted && recognizedText.isNotEmpty) {
-              setState(() {
-                _lastTranscript = recognizedText;
-                debugPrint("StudentWordPracticePage: Cheetah recognized text: $_lastTranscript");
-              });
-            }
-          } catch (e, st) {
-            debugPrint('StudentWordPracticePage: Error running final assess on buffered PCM: $e\n$st');
+        debugPrint('StudentWordPracticePage: Cloud STT error, trying Cheetah: $e\n$st');
+        try {
+          attemptResult = await _cheetahAssessor.assess(referenceText: practiceWord!.text, audioBytes: pcmBytes, locale: 'en-US');
+          final recognizedText = attemptResult?.recognizedText ?? '';
+          if (mounted && recognizedText.isNotEmpty) {
+            setState(() {
+              _lastTranscript = recognizedText;
+              debugPrint("StudentWordPracticePage: Cheetah recognized text: $_lastTranscript");
+            });
           }
+        } catch (e2, st2) {
+          debugPrint('StudentWordPracticePage: Error running final assess on buffered PCM: $e2\n$st2');
         }
-        debugPrint('StudentWordPracticePage: Error running final assess on buffered PCM: $e\n$st');
       }
 
       // Cleanup temp files for PCM and WAV. AAC is kept for upload.

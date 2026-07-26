@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-12T22:35:09.036Z",
+  "generatedAt": "2026-07-13T03:38:32.661Z",
   "via": "firebase-proxy",
   "endpoint": "https://us-central1-cpsc4150-readright.cloudfunctions.net/generateStorySpike",
   "dolchWords": [
@@ -15,11 +15,11 @@
     "funny"
   ],
   "model": "gpt-4o-mini",
-  "story": "Sam has a big dog. The dog's name is Max. Max is blue and funny. One day, Sam and Max go to the park. Sam can run fast. Max can jump high. They play a game. Sam says, \"Can you find the ball?\" Max runs down the hill. He looks for the ball. Sam laughs. Max comes back with a stick. \"That is not the ball!\" says Sam. Max wags his tail. \"Let's play again!\" Sam says. They have fun all day. The sun is big and bright. It is a good day for Sam and Max.",
+  "story": "Sam has a big, blue ball. It is fun to play with. One day, Sam and his dog, Max, go to the park. \"Come and play!\" Sam says. Max runs fast to the ball. He can catch it! The ball goes up and down. Sam laughs. \"You are funny, Max!\" \n\nThey find a tree in the park. Sam says, \"Let’s sit down under the tree.\" They rest and drink water. \"This is a good day,\" Sam says. Max barks. He is happy too. \n\nThe sun is big and bright. Sam and Max play more. They can have fun all day!",
   "usage": {
     "prompt_tokens": 109,
-    "completion_tokens": 123,
-    "total_tokens": 232,
+    "completion_tokens": 134,
+    "total_tokens": 243,
     "prompt_tokens_details": {
       "cached_tokens": 0,
       "audio_tokens": 0
