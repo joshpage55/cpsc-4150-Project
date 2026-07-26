@@ -148,4 +148,4 @@ _[Screen 1: Game Start:
 |------|------|--------------|------|
 | Josh Page | Engineering | X | 7/12/26 |
 | Tyson Small | Product/UX | X | 7/12/26 |
-| Gabriel Walker | AI/Spike | ☐ | |
+| Gabriel Walker | AI/Spike | X | 7/12/26 |
