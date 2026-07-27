@@ -22,6 +22,7 @@ import 'screens/reader_selection_screen.dart';
 import 'screens/student/student_login_screen.dart';
 import 'screens/student/student_passcode_verification_screen.dart';
 import 'screens/student/student_word_dashboard_screen.dart';
+import 'screens/student/student_story_view_screen.dart';
 import 'screens/student/student_word_level_completed.dart';
 // Defer loading the heavy student practice screen (it pulls in FFmpeg).
 import 'screens/student/student_word_practice_screen.dart' deferred as student_practice;
@@ -31,6 +32,7 @@ import 'screens/teacher/login/teacher_register_screen.dart';
 import 'screens/teacher/login/teacher_password_reset_screen.dart';
 import 'screens/teacher/teacher_dashboard_screen.dart';
 import 'screens/teacher/teacher_word_dashboard_screen.dart';
+import 'screens/teacher/teacher_story_builder_screen.dart';
 import 'screens/teacher/class/class_dashboard_screen.dart';
 //import 'screens/teacher/class/class_student_details_screen.dart';
 import 'utils/app_constants.dart';
@@ -272,6 +274,7 @@ class ReadRightApp extends StatelessWidget {
           );
         },
         '/student-word-dashboard': (context) => const StudentWordDashboardPage(),
+        '/student-story-view': (context) => const StudentStoryViewPage(),
         '/student-word-level-completed': (context) => const StudentWordLevelCompletedPage(),
         '/student-word-practice': (context) => FutureBuilder<void>(
               future: student_practice.loadLibrary(),
@@ -290,6 +293,7 @@ class ReadRightApp extends StatelessWidget {
         '/teacher-password-reset': (context) => const TeacherPasswordResetPage(),
         '/teacher-dashboard': (context) => const TeacherDashboardPage(),
         '/teacher-word-dashboard': (context) =>  TeacherWordDashboardPage(),
+        '/teacher-story-builder': (context) => const TeacherStoryBuilderPage(),
         '/class-dashboard': (context) => const ClassDashboard(),
         '/profile-settings': (context) => const ProfilePage(),
 //        '/class-student-details': (context) => const ClassStudentDetails(),

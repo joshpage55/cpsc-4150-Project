@@ -141,7 +141,7 @@ class CurrentUserModel extends ChangeNotifier {
     debugPrint('CurrentUserModel: Logging in username ${_user!.username}, email ${_user!.email}');
 
     // Load class section for the logged-in user
-    late final clsSection;
+    late final List<ClassModel> clsSection;
     switch (_user!.role) {
       case UserRole.teacher:
         debugPrint('CurrentUserModel: Logged in as teacher ${_user!.username}');

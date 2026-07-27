@@ -201,6 +201,13 @@ class _TeacherDashboardPageState extends State<TeacherDashboardPage> {
                   );
                 }
             ),
+            IconButton(
+              icon: const Icon(Icons.auto_awesome, color: AppColors.buttonPrimaryGray),
+              tooltip: 'Story Builder',
+              onPressed: () {
+                Navigator.pushNamed(context, '/teacher-story-builder');
+              },
+            ),
           ],
           bottom: const TabBar(
             tabs: [

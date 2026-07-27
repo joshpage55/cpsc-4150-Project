@@ -1,4 +1,5 @@
 import 'package:cloud_functions/cloud_functions.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:readright/models/story_model.dart';
 import 'package:readright/services/story_repository.dart';
 
@@ -27,12 +28,29 @@ class StoryService {
   StoryService({
     FirebaseFunctions? functions,
     StoryRepository? repository,
-  })  : _functions = functions ??
-            FirebaseFunctions.instanceFor(region: 'us-central1'),
+  })  : _functions = functions,
         _repository = repository ?? StoryRepository();
 
-  final FirebaseFunctions _functions;
+  Future<void> _ensureFirebaseInitialized() async {
+    try {
+      if (Firebase.apps.isEmpty) {
+        await Firebase.initializeApp();
+      }
+    } catch (_) {
+      // Ignore initialization failures here; the UI will still render and
+      // the user can attempt generation once Firebase is configured.
+    }
+  }
+
+  final FirebaseFunctions? _functions;
   final StoryRepository _repository;
+
+  FirebaseFunctions get _functionsInstance {
+    if (_functions != null) {
+      return _functions!;
+    }
+    return FirebaseFunctions.instanceFor(region: 'us-central1');
+  }
 
   StoryRepository get repository => _repository;
 
@@ -45,7 +63,8 @@ class StoryService {
     required List<String> dolchWords,
     int maxWords = 120,
   }) async {
-    final callable = _functions.httpsCallable('generateStory');
+    await _ensureFirebaseInitialized();
+    final callable = _functionsInstance.httpsCallable('generateStory');
     final response = await callable.call(<String, dynamic>{
       'studentId': studentId,
       'classId': classId,
@@ -85,7 +104,8 @@ class StoryService {
 
   /// Teacher-in-the-loop: approve draft so student can read it.
   Future<StoryModel> approve(String storyId) async {
-    final callable = _functions.httpsCallable('approveStory');
+    await _ensureFirebaseInitialized();
+    final callable = _functionsInstance.httpsCallable('approveStory');
     await callable.call(<String, dynamic>{'storyId': storyId});
 
     final updated = await _repository.fetchById(storyId);

@@ -5,10 +5,8 @@ import 'package:readright/models/class_model.dart';
 
 import 'package:readright/models/current_user_model.dart';
 import 'package:readright/models/user_model.dart';
-import 'package:readright/models/word_model.dart';
 import 'package:readright/models/attempt_model.dart';
 import 'package:readright/services/attempt_repository.dart';
-import 'package:readright/services/class_repository.dart';
 import 'package:readright/services/word_respository.dart';
 import 'package:readright/utils/app_colors.dart';
 import 'package:readright/utils/app_scoring.dart';
@@ -23,12 +21,10 @@ class StudentWordDashboardPage extends StatefulWidget {
       _StudentWordDashboardPageState();
 }
 
-class _StudentWordDashboardPageState extends State<StudentWordDashboardPage> { 
-
-  late final UserModel? _currentUser;
-  late final ClassModel? _currentClassSection;
-  late final List<AttemptModel> _userAttempts;
-  late final String practiceWord;
+class _StudentWordDashboardPageState extends State<StudentWordDashboardPage> {
+  UserModel? _currentUser;
+  ClassModel? _currentClassSection;
+  List<AttemptModel> _userAttempts = [];
 
   @override
   void initState() {
@@ -38,25 +34,37 @@ class _StudentWordDashboardPageState extends State<StudentWordDashboardPage> {
     // If a user is already signed in, we can skip the login screen
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _currentUser = context.read<CurrentUserModel>().user;
-      if (_currentUser != null) {
-        _currentClassSection = context.read<CurrentUserModel>().classSection;
+      _currentClassSection = context.read<CurrentUserModel>().classSection;
 
+      if (_currentUser == null) {
+        debugPrint('StudentWordDashboardPage: No persisted user found.');
+        if (mounted) {
+          setState(() {
+            _userAttempts = [];
+          });
+        }
+        return;
+      }
+
+      final userId = _currentUser!.id ?? '';
+      final username = _currentUser!.username;
+      final email = _currentUser!.email;
+      final roleName = _currentUser!.role.name;
+      debugPrint('StudentWordDashboardPage: User UID: $userId, Username: $username, Email: $email, Role: $roleName');
+
+      if (mounted) {
         setState(() {
-          debugPrint('StudentWordDashboardPage: User UID: ${_currentUser!.id}, Username: ${_currentUser!.username}, Email: ${_currentUser!.email}, Role: ${_currentUser!.role.name}');
-        
-          // Fetch attempts for the current user from the database.
           AttemptRepository().fetchAttemptsByUser(
-            _currentUser?.id ?? '',
+            userId,
             classId: _currentClassSection?.id ?? 'Unknown',
           ).then((attempts) {
+            if (!mounted) return;
+            setState(() {
               _userAttempts = attempts;
-              debugPrint('Fetched ${_userAttempts.length} attempts for user ${_currentUser?.id}');
+              debugPrint('Fetched ${_userAttempts.length} attempts for user $userId');
+            });
           });
-
         });
-      } else {
-        debugPrint('StudentWordDashboardPage: No persisted user found.');
-        _userAttempts = [];
       }
     });
 
@@ -80,10 +88,8 @@ class _StudentWordDashboardPageState extends State<StudentWordDashboardPage> {
       debugPrint('Fetching words for level: ${wordLevel.name}');
       final words = await WordRepository().fetchLevelWords(wordLevel);
       final wordIds = words.map((w) => w.id ?? '').toList();
-      if (wordIds.isEmpty) return 0;
+      if (wordIds.isEmpty || _userAttempts.isEmpty) return 0;
 
-      // Count words where the user has at least one attempt with score > 0.00
-      if (_userAttempts.isEmpty) return 0;
       int completed = 0;
       for (final word in wordIds) {
         final hasSuccessfulAttempt = _userAttempts.any(
@@ -129,8 +135,9 @@ class _StudentWordDashboardPageState extends State<StudentWordDashboardPage> {
                             future: _fetchLevelWordCompletedTotalByUser(wordLevel),
                             builder: (context, snapshotCompleted) {
                               final completed = snapshotCompleted.data ?? 0;
-                              int remaining = computedTotalWords - completed;
-                              if (remaining < 0) remaining = 0;
+                              final int remaining = computedTotalWords > completed
+                                  ? computedTotalWords - completed
+                                  : 0;
                               final progress = computedTotalWords > 0
                                   ? completed / computedTotalWords
                                   : 0.0;
@@ -140,7 +147,7 @@ class _StudentWordDashboardPageState extends State<StudentWordDashboardPage> {
                                 child: _buildWordListCard(
                                   title: wordLevel.name,
                                   backgroundColor:
-                                      wordLevel.backgroundColor.withOpacity(0.20),
+                                      wordLevel.backgroundColor.withValues(alpha: 0.20),
                                   borderRadius: 20,
                                   icon:
                                     _buildUnLockIcon(color: Colors.green), 
@@ -202,6 +209,14 @@ class _StudentWordDashboardPageState extends State<StudentWordDashboardPage> {
                     ),
                     const Spacer(),
                     IconButton(
+                      icon: const Icon(Icons.auto_stories, color: AppColors.buttonPrimaryGray),
+                      iconSize: 30,
+                      tooltip: 'Stories',
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/student-story-view');
+                      },
+                    ),
+                    IconButton(
                         icon: const Icon(Icons.account_circle, color: AppColors.buttonPrimaryGray),
                         iconSize: 36, 
                         onPressed: () {
@@ -251,28 +266,6 @@ class _StudentWordDashboardPageState extends State<StudentWordDashboardPage> {
   }) {
     return GestureDetector(
       onTap: () async {
-          // show a little feedback while we fetch (optional)
-          // showDialog(
-          //   context: context,
-          //   barrierDismissible: false,
-          //   builder: (_) => const Center(child: CircularProgressIndicator()),
-          // );
-
-          // final WordModel? practiceWord = await context
-          //     .read<CurrentUserModel>()
-          //     .fetchUsersNextPracticeWord(wordLevelFromString(title));
-
-          // remove the loading dialog
-          // if (Navigator.canPop(context)) Navigator.of(context).pop();
-
-          // If no word available, show snack or early return
-          // if (practiceWord == null) {
-          //   ScaffoldMessenger.of(context).showSnackBar(
-          //     const SnackBar(content: Text('No practice word available')),
-          //   );
-          //   return;
-          // }
-
           Navigator.pushNamedAndRemoveUntil(
             context,
             '/student-word-practice',
@@ -365,7 +358,7 @@ class _StudentWordDashboardPageState extends State<StudentWordDashboardPage> {
   }
 
   Widget _buildProgressBar(double progress) {
-    return Container(
+    return SizedBox(
       height: 20,
       // padding: const EdgeInsets.symmetric(horizontal: 2),
       child: Stack(
@@ -373,7 +366,7 @@ class _StudentWordDashboardPageState extends State<StudentWordDashboardPage> {
           Container(
             height: 8,
             decoration: BoxDecoration(
-              color: const Color(0xFF787878).withOpacity(0.20),
+              color: const Color(0xFF787878).withValues(alpha: 0.20),
               borderRadius: BorderRadius.circular(3),
             ),
           ),
@@ -391,25 +384,6 @@ class _StudentWordDashboardPageState extends State<StudentWordDashboardPage> {
             ),
         ],
       ),
-    );
-  }
-
-  Widget _buildCheckIcon() {
-    return SvgPicture.asset(
-      'assets/icons/circle-check-filled-svgrepo-com.svg',
-      width: 40,
-      height: 40,
-      semanticsLabel: 'Green Check',
-    );
-  }
-
-  Widget _buildLockIcon({required Color color}) {
-    return SvgPicture.asset(
-      'assets/icons/lock-svgrepo-com.svg',
-      width: 40,
-      height: 40,
-      semanticsLabel: 'Lock',
-      colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
     );
   }
 
