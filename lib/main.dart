@@ -102,20 +102,20 @@ class _AppInitializerState extends State<AppInitializer> {
     if (_initialized) return;
     _initialized = true;
 
-    if (kIsWeb) return;
-
     try {
       // Enable persistence and set cache size; ignore on web where settings may differ.
       // Use large cache for offline support for query indexing and LRU eviction to avoid frequent re-fetching.
       // We previously had Settings.CACHE_SIZE_UNLIMITED but that could lead to storage issues on device or app crashes.
       
-      try {
-        FirebaseFirestore.instance.settings = const Settings(
-          persistenceEnabled: true,
-          cacheSizeBytes: 200 * 1024 * 1024, // 200 MB
-        );
-      } catch (e) {
-        debugPrint('Could not apply Firestore settings (platform may not support): $e');
+      if (!kIsWeb) {
+        try {
+          FirebaseFirestore.instance.settings = const Settings(
+            persistenceEnabled: true,
+            cacheSizeBytes: 200 * 1024 * 1024, // 200 MB
+          );
+        } catch (e) {
+          debugPrint('Could not apply Firestore settings (platform may not support): $e');
+        }
       }
 
       // Initialize notifiers that were created before init
@@ -169,51 +169,6 @@ class _AppInitializerState extends State<AppInitializer> {
         // ignore: use_build_context_synchronously
         // await context.read<CurrentUserModel>().logOut();
       });
-
-      // Manually upload seed words from asset on app start
-      // We do this here to ensure it's done once when the app starts.
-      // This is a one-time operation; in a real app, you'd likely remove this after the initial upload.
-      // SeedWordsUploader.uploadFromAsset().then((_) {
-      //   debugPrint('Seed words upload completed.');
-      // }).catchError((e) {
-      //   debugPrint('Seed words upload failed: $e');
-      // });
-
-      // FirestoreUtils.renameCollection('students', 'student.progress').then((_) {
-      //   debugPrint('Collection rename completed.');
-      // }).catchError((e, st) {
-      //   debugPrint('Collection rename failed: $e\n$st');
-      // });
-
-      // Delete all documents in 'attempts' where userId == current signed-in user.
-      // try {
-      //   final uid = auth.currentUser?.uid;
-      //   if (uid == null) {
-      //     debugPrint('No signed-in user; skipping attempts cleanup.');
-      //   } else {
-      //     const int batchSize = 500;
-      //     while (true) {
-      //       final query = firestore
-      //           .collection('attempts')
-      //           .where('userId', isEqualTo: uid)
-      //           .limit(batchSize);
-      //       final snapshot = await query.get();
-      //       if (snapshot.docs.isEmpty) break;
-
-      //       final batch = firestore.batch();
-      //       for (final doc in snapshot.docs) {
-      //         batch.delete(doc.reference);
-      //       }
-      //       await batch.commit();
-      //       debugPrint('Deleted ${snapshot.docs.length} attempt(s) for uid=$uid');
-      //       // Continue looping until no more matching documents remain.
-      //     }
-      //     debugPrint('Attempt cleanup completed for uid=$uid');
-      //   }
-      // } catch (e, st) {
-      //   debugPrint('Failed to delete attempts for current user: $e\n$st');
-      // }
-
     } catch (e, st) {
       debugPrint('Firebase initialization failed: $e\n$st');
     }

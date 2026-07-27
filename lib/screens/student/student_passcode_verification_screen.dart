@@ -79,16 +79,26 @@ class _StudentPasscodeVerificationPageState
 
     // Authenticate the user using Firebase Authentication (Email/Classcode).
     try {
-      await UserRepository().signInFirebaseEmailPasswordUser(
+      final signedIn = await UserRepository().signInFirebaseEmailPasswordUser(
         email: widget.email!,
         securePassword: _passcode,
-      ); 
+      );
+      if (signedIn == null) {
+        _showSnackBar(
+          message: 'Authentication failed. Check the class code and try again.',
+          duration: const Duration(seconds: 3),
+          bgColor: AppColors.bgPrimaryRed,
+        );
+        return;
+      }
+      // ignore: use_build_context_synchronously
+      await context.read<CurrentUserModel>().logIn(signedIn);
     } catch (e) {
       debugPrint('Failed to sign in as ${widget.username}: $e');
 
       _showSnackBar(
-        message: 'Authentication failed. Please try again later.',
-        duration: const Duration(seconds: 2),
+        message: 'Authentication failed: $e',
+        duration: const Duration(seconds: 4),
         bgColor: AppColors.bgPrimaryRed,
       );
       return;
