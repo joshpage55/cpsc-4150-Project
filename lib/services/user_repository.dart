@@ -81,12 +81,7 @@ class UserRepository {
       uid: _auth.currentUser?.uid,
     );
 
-    try {
-      await docRef.set(prepared);
-    } on FirebaseException catch (e, st) {
-      // Handle Firestore-specific errors
-      debugPrint("Firestore upsert failed: ${e.code} — ${e.message}\n$st");
-    }
+    await docRef.set(prepared);
   }
 
   // Convenience: fetch the currently-signed-in user's document. Returns
@@ -100,39 +95,44 @@ class UserRepository {
   // Create a new FirebaseAuth user and corresponding Firestore document.
   Future<UserModel?> createFirebaseEmailPasswordUser({required UserModel user, required String securePassword}) async {
     try {
-      // If a username is provided, ensure it's unique in the users collection
-      final username = user.username.trim();
-      if (username.isNotEmpty) {
-        final existing = await _db.collection('users')
-          .where('username', isEqualTo: username)
-          .limit(1)
-          .get();
-        if (existing.docs.isNotEmpty) {
-          // Throw an auth-style exception so callers can handle it similarly
-          throw FirebaseAuthException(
-            code: 'username-already-exists',
-            message: 'The username "$username" is already in use.',
-          );
-        }
-      }
+      // Create Auth user first so later Firestore writes run as an authenticated caller.
       final authResult = await _auth.createUserWithEmailAndPassword(
-        email: user.email,
+        email: user.email.trim(),
         password: securePassword,
       );
-      // Use the UID from FirebaseAuth as the document ID in Firestore.
-      final newUser = user.copyWith(id: authResult.user?.uid);
+
+      final username = user.username.trim();
+      if (username.isNotEmpty) {
+        try {
+          final existing = await _db.collection('users')
+            .where('username', isEqualTo: username)
+            .limit(1)
+            .get();
+          if (existing.docs.isNotEmpty &&
+              existing.docs.first.id != authResult.user?.uid) {
+            // Roll back auth user if username is taken.
+            await authResult.user?.delete();
+            throw FirebaseAuthException(
+              code: 'username-already-exists',
+              message: 'The username "$username" is already in use.',
+            );
+          }
+        } on FirebaseException catch (e) {
+          // Don't block signup if rules temporarily block the uniqueness query.
+          if (e.code != 'permission-denied') rethrow;
+          debugPrint('Username uniqueness check skipped: ${e.code}');
+        }
+      }
+
+      final newUser = user.copyWith(
+        id: authResult.user?.uid,
+        email: user.email.trim(),
+        username: username,
+      );
       await upsertUser(newUser);
       return newUser;
     } on FirebaseAuthException catch (e, st) {
-      debugPrint("Auth fetchSignInMethodsForEmail failed: ${e.code} — ${e.message}\n$st");
-
-      if (e.code == 'user-not-found') {
-        debugPrint('No user found for that email.');
-      } else if (e.code == 'wrong-password') {
-        debugPrint('Wrong password provided for that user.');
-      } else if (e.code == 'email-already-in-use') {
-        debugPrint('The account already exists for that email.');
-      }
+      debugPrint("Auth createUser failed: ${e.code} — ${e.message}\n$st");
       rethrow;
     }
   }

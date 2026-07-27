@@ -28,8 +28,17 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController usernameController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late final PasswordPolicy firebaseAuthPasswordPolicy;
-  late final UserModel? userModel;
+  // Defaults match fetchPasswordPolicy(); avoid LateInitializationError on fast submit.
+  PasswordPolicy firebaseAuthPasswordPolicy = const PasswordPolicy(
+    min: 8,
+    max: 4096,
+    needLower: true,
+    needUpper: true,
+    needNum: true,
+    needSym: true,
+  );
+  UserModel? userModel;
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -109,18 +118,21 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
       return;
     }
 
+    if (_isSubmitting) return;
+    setState(() => _isSubmitting = true);
+
     // Create credentials with Firebase Authentication here using the controllers text completed by the user.
 
     // Try to create the user with Firebase Authentication
     try {
       userModel = await UserRepository().createFirebaseEmailPasswordUser(
         user: UserModel(
-          email: emailController.text,
+          email: emailController.text.trim(),
           role: UserRole.teacher,
-          fullName: fullNameController.text,
+          fullName: fullNameController.text.trim(),
           local: 'en-US',
-          institution: institutionController.text,
-          username: usernameController.text,
+          institution: institutionController.text.trim(),
+          username: usernameController.text.trim(),
 
           // TODO: Skipping these checks for now. May need to implement email verification later.
           // Everyone that creates and account here is automatically verified and have approved email status.
@@ -144,7 +156,7 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
 
         final classSection = ClassModel(
           teacherId: teacherUid as String,
-          institution: institutionController.text,
+          institution: institutionController.text.trim(),
           sectionId: '001', // Default section ID
           totalWordsToComplete: totalWords,
         );
@@ -154,9 +166,13 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
         await ClassRepository().upsertClass(classSection);
 
       }
+      if (!mounted) return;
+      setState(() => _isSubmitting = false);
+      navigateToDashboard();
+      return;
         
     } on FirebaseException catch (e, st) {
-      debugPrint("Error during user creation: ${e.toString()}\n$st");
+      debugPrint("Error during user creation: ${e.code} ${e.message}\n$st");
 
       if (e.code == 'email-already-in-use') {
         _showSnackBar(
@@ -178,8 +194,9 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
         );
       } else if (e.code == 'operation-not-allowed') {
         _showSnackBar(
-          message: 'Email/password accounts are not enabled.',
-          duration: const Duration(seconds: 3),
+          message:
+              'Email/password sign-in is disabled in Firebase Console. Enable it under Authentication → Sign-in method.',
+          duration: const Duration(seconds: 5),
           bgColor: AppColors.bgPrimaryRed,
         );
       } else if (e.code == 'network-request-failed') {
@@ -201,22 +218,30 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
           duration: const Duration(seconds: 3),
           bgColor: AppColors.bgPrimaryRed,
         );
-      } else {
-        // Could not create user, so we just need to show the error message.
-        debugPrint('User creation failed for email: ${emailController.text}');
+      } else if (e.code == 'permission-denied') {
         _showSnackBar(
           message:
-              'User creation failed. Please check your registration fields.',
-          duration: const Duration(seconds: 3),
+              'Firestore blocked the write (permission-denied). Update Firestore rules to allow authenticated users.',
+          duration: const Duration(seconds: 5),
+          bgColor: AppColors.bgPrimaryRed,
+        );
+      } else {
+        _showSnackBar(
+          message: 'Registration failed (${e.code}): ${e.message ?? e.code}',
+          duration: const Duration(seconds: 5),
           bgColor: AppColors.bgPrimaryRed,
         );
       }
-
-      // Make sure to return so we don't navigate to the teacher dashboard
-      return;
+    } catch (e, st) {
+      debugPrint('Unexpected registration error: $e\n$st');
+      _showSnackBar(
+        message: 'Registration failed: $e',
+        duration: const Duration(seconds: 5),
+        bgColor: AppColors.bgPrimaryRed,
+      );
     }
 
-    navigateToDashboard();
+    if (mounted) setState(() => _isSubmitting = false);
   }
 
   @override
@@ -445,7 +470,7 @@ class _TeacherRegisterPageState extends State<TeacherRegisterPage> {
       style: AppStyles.textFieldText,
       decoration: InputDecoration(
         labelText: 'Password',
-        hintText: 'Password',
+        hintText: 'e.g. Password1!',
         prefixIcon: Padding(
           padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
           child: SvgPicture.asset(

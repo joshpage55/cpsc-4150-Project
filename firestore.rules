@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Class demo rules: signed-in users can read/write app data.
+    // Tighten before any public/store release.
+    match /{document=**} {
+      allow read, write: if request.auth != null;
+    }
+  }
+}
