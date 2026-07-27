@@ -33,6 +33,18 @@ void main() {
       expect(restored.verificationStatus, equals(original.verificationStatus));
     });
 
+    test('fromJson accepts lowercase verification status values', () {
+      final user = UserModel.fromJson({
+        'id': 'user-123',
+        'email': 'student@example.com',
+        'fullName': 'Student Name',
+        'role': 'student',
+        'verificationStatus': 'approved',
+      });
+
+      expect(user.verificationStatus, equals(VerificationStatus.approved));
+    });
+
     test('copyWith creates modified copy and preserves other fields', () {
       final original = UserModel(
         id: 'user-123',

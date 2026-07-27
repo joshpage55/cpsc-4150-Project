@@ -145,7 +145,14 @@ class CurrentUserModel extends ChangeNotifier {
     switch (_user!.role) {
       case UserRole.teacher:
         debugPrint('CurrentUserModel: Logged in as teacher ${_user!.username}');
-        clsSection = await ClassRepository().fetchClassesByTeacher(_user!.id as String);
+        try {
+          clsSection = await ClassRepository()
+              .fetchClassesByTeacher(_user!.id as String)
+              .timeout(const Duration(seconds: 8), onTimeout: () => []);
+        } catch (e) {
+          debugPrint('CurrentUserModel: Teacher class fetch timed out or failed: $e');
+          clsSection = [];
+        }
 
         if (clsSection.isEmpty) {
           debugPrint('CurrentUserModel: No class section found for teacher ${_user!.id}');
@@ -154,11 +161,22 @@ class CurrentUserModel extends ChangeNotifier {
         }
         _classSection = clsSection.first;
 
-        await loadStudents();
+        try {
+          await loadStudents().timeout(const Duration(seconds: 8));
+        } catch (e) {
+          debugPrint('CurrentUserModel: Student load timed out or failed: $e');
+        }
         break;
       case UserRole.student:
         debugPrint('CurrentUserModel: Logged in as student ${_user!.username}');
-        clsSection = await ClassRepository().fetchClassesByStudent(_user!.id as String);
+        try {
+          clsSection = await ClassRepository()
+              .fetchClassesByStudent(_user!.id as String)
+              .timeout(const Duration(seconds: 8), onTimeout: () => []);
+        } catch (e) {
+          debugPrint('CurrentUserModel: Student class fetch timed out or failed: $e');
+          clsSection = [];
+        }
 
         if (clsSection.isEmpty) {
           debugPrint('CurrentUserModel: No class section found for student ${_user!.id}');
@@ -167,25 +185,38 @@ class CurrentUserModel extends ChangeNotifier {
         }
         _classSection = clsSection.first;
 
-        wordAttempts = await AttemptRepository().fetchAttemptsByUser(
-          _user?.id as String,
-          classId: _classSection?.id ?? 'Unknown',
-        );
+        try {
+          wordAttempts = await AttemptRepository().fetchAttemptsByUser(
+            _user?.id as String,
+            classId: _classSection?.id ?? 'Unknown',
+          ).timeout(const Duration(seconds: 8), onTimeout: () => []);
+        } catch (e) {
+          debugPrint('CurrentUserModel: Attempt fetch timed out or failed: $e');
+          wordAttempts = [];
+        }
 
         // Load student progress to set current word level and completed levels
         // ignore: use_build_context_synchronously
-        final studentProgress = await StudentProgressRepository().fetchProgressByUid(userModel.id as String);
+        try {
+          final studentProgress = await StudentProgressRepository()
+              .fetchProgressByUid(userModel.id as String)
+              .timeout(const Duration(seconds: 8), onTimeout: () => null);
 
-        if (studentProgress?.currentWordLevel != null) {
-          currentWordLevel = studentProgress!.currentWordLevel;
-        } else {
-          debugPrint('CurrentUserModel: No current word level found for student ${_user!.username}, defaulting to Pre-Primer.');
+          if (studentProgress?.currentWordLevel != null) {
+            currentWordLevel = studentProgress!.currentWordLevel;
+          } else {
+            debugPrint('CurrentUserModel: No current word level found for student ${_user!.username}, defaulting to Pre-Primer.');
+            currentWordLevel = fetchWordLevelsIncreasingDifficultyOrder().first;
+          }
+
+          final levelsCompleted = studentProgress?.wordLevelsCompleted;
+          if (levelsCompleted != null && levelsCompleted.isNotEmpty) {
+            wordLevelsCompleted = levelsCompleted;
+          }
+        } catch (e) {
+          debugPrint('CurrentUserModel: Progress fetch timed out or failed: $e');
           currentWordLevel = fetchWordLevelsIncreasingDifficultyOrder().first;
-        }
-
-        final levelsCompleted = studentProgress?.wordLevelsCompleted;
-        if (levelsCompleted != null && levelsCompleted.isNotEmpty) {
-          wordLevelsCompleted = levelsCompleted;
+          wordLevelsCompleted = {};
         }
         break;
       default:

@@ -57,12 +57,18 @@ class _StudentWordDashboardPageState extends State<StudentWordDashboardPage> {
           AttemptRepository().fetchAttemptsByUser(
             userId,
             classId: _currentClassSection?.id ?? 'Unknown',
-          ).then((attempts) {
+          ).timeout(const Duration(seconds: 8), onTimeout: () => <AttemptModel>[]).then((attempts) {
             if (!mounted) return;
             setState(() {
               _userAttempts = attempts;
               debugPrint('Fetched ${_userAttempts.length} attempts for user $userId');
             });
+          }).catchError((e) {
+            if (!mounted) return;
+            setState(() {
+              _userAttempts = [];
+            });
+            debugPrint('StudentWordDashboardPage: Attempt fetch failed: $e');
           });
         });
       }

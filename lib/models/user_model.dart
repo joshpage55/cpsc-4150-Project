@@ -93,17 +93,21 @@ class UserModel {
 
   // Utility to map a role String to the VerificationStatus enum
   static VerificationStatus _mapVerificationStringToEnum(String verification) {
-    switch (verification) {
-      case 'Pending':
+    final normalized = verification.trim().toLowerCase();
+    switch (normalized) {
+      case 'pending':
         return VerificationStatus.pending;
-      case 'Approved':
+      case 'approved':
         return VerificationStatus.approved;
-      case 'Rejected':
+      case 'rejected':
         return VerificationStatus.rejected;
-      case 'Submitted':
+      case 'submitted':
         return VerificationStatus.submitted;
-      case 'Under Review':
+      case 'under review':
+      case 'under_review':
         return VerificationStatus.underReview;
+      case 'unknown':
+        return VerificationStatus.unknown;
       default:
         return VerificationStatus.unknown;
     }
