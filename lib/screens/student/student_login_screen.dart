@@ -176,31 +176,40 @@ class _StudentLoginPageState extends State<StudentLoginPage> {
       return;
     }
 
-    // Check to see if the username exists in Firebase.
-    final userModelExists = await UserRepository().fetchUserByUsername(username);
-    if (userModelExists == null || userModelExists.id?.isEmpty == true) {
+    try {
+      // Check to see if the username exists in Firebase.
+      final userModelExists = await UserRepository().fetchUserByUsername(username);
+      if (userModelExists == null || userModelExists.id?.isEmpty == true) {
+        _showSnackBar(
+          message:
+              'The username "$username" does not exist. Ask your teacher to add you first.',
+          duration: const Duration(seconds: 3),
+          bgColor: AppColors.bgPrimaryRed,
+        );
+        return;
+      }
+
+      await Future.delayed(const Duration(seconds: 1));
+      if (!mounted) return;
+
+      // Navigate to the passcode verification screen and remove all previous routes
+      // to prevent going back to the login screen.
+      Navigator.pushNamed(
+        context,
+        '/student-passcode-verification',
+        arguments: {
+          'username': username,
+          'email': userModelExists.email,
+        },
+      );
+    } catch (e) {
+      debugPrint('Student username lookup failed: $e');
       _showSnackBar(
-        message: 'The username "$username" does not exist.',
-        duration: const Duration(seconds: 2),
+        message: 'Could not look up username: $e',
+        duration: const Duration(seconds: 4),
         bgColor: AppColors.bgPrimaryRed,
       );
-      return;
     }
-
-    await Future.delayed(const Duration(seconds: 2));
-    if (!mounted) return;
-
-    // Navigate to the passcode verification screen and remove all previous routes
-    // to prevent going back to the login screen.
-    Navigator.pushNamed(
-      context,
-      '/student-passcode-verification',
-      arguments: {
-        'username': username,
-        'email': userModelExists.email,
-      },
-    );
-    
   }
 
   @override
