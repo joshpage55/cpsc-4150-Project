@@ -54,7 +54,7 @@
 
 # Prompt Log — Gabriel Scott Walker
 
-**Course:** CPSC 4150 · M2  
+**Course:** CPSC 4150 · M3
 **Rule:** Six prompts per student. One section per prompt.
 
 ---

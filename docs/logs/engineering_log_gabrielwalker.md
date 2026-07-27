@@ -43,6 +43,11 @@ running `flutter pub get` and running `pip install -r requirements`. The solutio
 
 **Result:** A complete log tracking progress in the progress of the project.
 
+# Engineering Log — Gabriel Scott Walker
+
+**Course:** CPSC 4150 · M3
+**Repo:** `joshpage55/cpsc-4150-Project`
+
 ## 2026-07-26 - M3 Created Tests for the new scoring system
 
 **What:** Completed tests for scoring system.
