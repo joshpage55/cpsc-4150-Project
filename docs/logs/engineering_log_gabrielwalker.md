@@ -37,8 +37,44 @@ running `flutter pub get` and running `pip install -r requirements`. The solutio
 
 **Result:** I am able to access the api key.
 
-## 2026-08-12 - M2 Completed My Engineering Log
+## 2026-07-12 - M2 Completed My Engineering Log
 
 **What:** Completed my engineering log.
 
 **Result:** A complete log tracking progress in the progress of the project.
+
+## 2026-07-26 - M3 Created Tests for the new scoring system
+
+**What:** Completed tests for scoring system.
+
+**Result:** The scoring system was successfully implemented.
+
+## 2026-07-26 - M3 Created tests for story prompts
+
+**What:** Created story prompt tests using javascript
+
+**Result:** The tests confirmed that the prompts were functioning as intended.
+
+## 2026-07-26 - M3 Downloaded Node JS
+
+**What:** I downloaded Node JS to test javascript files
+
+**Result:** The tests were successfully tested.
+
+## 2026-07-26 - M3 Verified Spike
+
+**What:** Verified that only the necessary information is present in the spike.
+
+**Result:** There was only the necessary information needed for the spike.
+
+## 2026-07-26 - M3 Tested Sign Up Functionality
+
+**What:** Sign up not initially working.
+
+**Result:** Team member fixes the sign in issue and now functions.
+
+## 2026-07-26 - M3 Completed Personal Kaltra Clip
+
+**What:** Completed Personal Kaltra Clip.
+
+**Result:** Completed my personal video clip that I needed to complete.
