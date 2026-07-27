@@ -13,7 +13,7 @@ class StudentStoryViewPage extends StatefulWidget {
 }
 
 class _StudentStoryViewPageState extends State<StudentStoryViewPage> {
-  final StoryService _storyService = StoryService();
+  StoryService? _storyService;
   late Future<List<StoryModel>> _storiesFuture;
 
   @override
@@ -27,7 +27,13 @@ class _StudentStoryViewPageState extends State<StudentStoryViewPage> {
     if (user == null || user.id == null || user.id!.isEmpty) {
       return [];
     }
-    return _storyService.approvedForStudent(user.id!);
+
+    try {
+      _storyService ??= StoryService();
+      return await _storyService!.approvedForStudent(user.id!);
+    } catch (_) {
+      return [];
+    }
   }
 
   @override

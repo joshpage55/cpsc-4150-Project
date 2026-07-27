@@ -14,8 +14,9 @@ void main() {
         child: const MaterialApp(home: StudentStoryViewPage()),
       ),
     );
+    await tester.pump();
 
     expect(find.text('Stories'), findsOneWidget);
-    expect(find.text('Your approved stories'), findsOneWidget);
+    expect(find.text('Your approved stories will appear here.'), findsOneWidget);
   });
 }

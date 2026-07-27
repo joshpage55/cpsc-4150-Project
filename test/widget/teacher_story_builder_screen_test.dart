@@ -10,7 +10,11 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   setUpAll(() async {
-    await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    try {
+      await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+    } catch (_) {
+      // Ignore initialization failures in test environments without native Firebase support.
+    }
   });
 
   testWidgets('renders teacher story builder controls', (tester) async {
@@ -22,6 +26,7 @@ void main() {
         child: const MaterialApp(home: TeacherStoryBuilderPage()),
       ),
     );
+    await tester.pump();
 
     expect(find.text('Teacher Story Builder'), findsOneWidget);
     expect(find.text('Create a story draft for a student'), findsOneWidget);

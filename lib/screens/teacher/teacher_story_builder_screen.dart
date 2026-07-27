@@ -56,19 +56,27 @@ class _TeacherStoryBuilderPageState extends State<TeacherStoryBuilderPage> {
       return;
     }
 
-    final snapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .where('id', whereIn: classSection.studentIds)
-        .get();
+    try {
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .where('id', whereIn: classSection.studentIds)
+          .get();
 
-    final students = snapshot.docs
-        .map((doc) => UserModel.fromJson(doc.data()))
-        .toList();
+      final students = snapshot.docs
+          .map((doc) => UserModel.fromJson(doc.data()))
+          .toList();
 
-    if (students.isNotEmpty && mounted) {
-      setState(() {
-        _selectedStudent = students.first;
-      });
+      if (students.isNotEmpty && mounted) {
+        setState(() {
+          _selectedStudent = students.first;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _error = 'Could not load students right now.';
+        });
+      }
     }
   }
 
