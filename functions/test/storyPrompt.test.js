@@ -65,7 +65,7 @@ test("rejects a whitespace-only interest string", () => {
   );
 });
 
-test("falls back to the default interest when interest is an empty string", () => {
+test("falls back to default interest when interest is empty", () => {
   // An empty string is falsy, so buildStoryPrompt substitutes the default
   // before validateInterest ever runs.
   const {user} = buildStoryPrompt(["the"], {interest: ""});
