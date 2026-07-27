@@ -304,6 +304,18 @@ class _StudentWordDashboardPageState extends State<StudentWordDashboardPage> {
                     ),
                   ),
                 ),
+                IconButton(
+                  icon: const Icon(Icons.videogame_asset_rounded, color: AppColors.buttonPrimaryBlue),
+                  iconSize: 32,
+                  tooltip: 'Play Word Match',
+                  onPressed: () {
+                    Navigator.pushNamed(
+                      context,
+                      '/student-word-match',
+                      arguments: {'wordLevel': wordLevelFromString(title)},
+                    );
+                  },
+                ),
                 icon,
               ],
             ),

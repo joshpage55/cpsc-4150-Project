@@ -24,6 +24,7 @@ import 'screens/student/student_passcode_verification_screen.dart';
 import 'screens/student/student_word_dashboard_screen.dart';
 import 'screens/student/student_story_view_screen.dart';
 import 'screens/student/student_word_level_completed.dart';
+import 'screens/student/student_word_match_screen.dart';
 // Defer loading the heavy student practice screen (it pulls in FFmpeg).
 import 'screens/student/student_word_practice_screen.dart' deferred as student_practice;
 import 'screens/student/student_word_feedback_screen.dart';
@@ -259,6 +260,7 @@ class ReadRightApp extends StatelessWidget {
               },
             ),
         '/student-word-feedback': (context) => const StudentWordFeedbackPage(),
+        '/student-word-match': (context) => const StudentWordMatchPage(),
         '/teacher-login': (context) => const TeacherLoginPage(),
         '/teacher-register': (context) => const TeacherRegisterPage(),
         '/teacher-password-reset': (context) => const TeacherPasswordResetPage(),
