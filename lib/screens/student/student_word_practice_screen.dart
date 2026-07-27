@@ -988,33 +988,24 @@ class _StudentWordPracticePageState extends State<StudentWordPracticePage>
   }
 
   Widget _buildInstructions() {
+    final instructionText = _isRecording
+        ? 'Listening for your voice…'
+        : _isProcessingRecording
+            ? 'Processing your try…'
+            : 'Listen to the word, then tap the microphone to speak.';
+
     return Container(
       width: double.infinity,
-      height: 100,
-      alignment: AlignmentDirectional.center,
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      margin: const EdgeInsets.symmetric(horizontal: 20),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
       decoration: BoxDecoration(
         color: const Color(0xFFFFC6C0).withOpacity(0.20),
+        borderRadius: BorderRadius.circular(16),
       ),
-      child: const Center(
-        child: SizedBox(
-          width: 349,
-          child: Column(
-            children: [
-              Text(
-                'Click the record button',
-                textAlign: TextAlign.center,
-                style: AppStyles.subheaderText,
-              ),
-              SizedBox(height: 8),
-              Text(
-                'to get started!',
-                textAlign: TextAlign.center,
-                style: AppStyles.subheaderText,
-              ),
-            ],
-          ),
-        ),
+      child: Text(
+        instructionText,
+        textAlign: TextAlign.center,
+        style: AppStyles.subheaderText,
       ),
     );
   }
@@ -1024,81 +1015,70 @@ class _StudentWordPracticePageState extends State<StudentWordPracticePage>
         ? 0
         : ((TIMER_DURATION_MS - _msElapsed + 999) ~/ 1000);
 
+    final buttonLabel = _isIntroductionTtsPlaying
+        ? 'Getting ready'
+        : _isRecording
+            ? 'Listening…'
+            : _isProcessingRecording
+                ? 'Working…'
+                : 'Tap to speak';
+
     debugPrint("StudentWordPracticePage: _buildRecordButton: isIntroTtsPlaying=$_isIntroductionTtsPlaying, isRecording=$_isRecording, isProcessing=$_isProcessingRecording, progress=$_progress, remaining=$remaining");
-    return 
-      (_isIntroductionTtsPlaying == true)
-        ? Container(
-            width: 160,
-            height: 48,
-            decoration: BoxDecoration(
-              color: AppColors.bgPrimaryGray,
-              borderRadius: BorderRadius.circular(1000),
+
+    return GestureDetector(
+      onTap: _isRecording ? _stopRecording : _handleRecord,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        width: 180,
+        height: 180,
+        decoration: BoxDecoration(
+          color: _isRecording
+              ? AppColors.buttonSecondaryRed
+              : AppColors.bgPrimaryOrange,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.14),
+              blurRadius: 14,
+              offset: const Offset(0, 8),
             ),
-            child: Center(
-              child: Text(
-                'RECORD',
-                style: AppStyles.buttonText,
-              ),
-            ),
-          )
-        : GestureDetector(
-            onTap: _isRecording ? _stopRecording : _handleRecord,
-            child: Container(
-              width: 160,
-              height: 48,
-              decoration: BoxDecoration(
-                color: _isRecording
-                    ? AppColors.buttonSecondaryRed
-                    : AppColors.bgPrimaryOrange,
-                borderRadius: BorderRadius.circular(1000),
-              ),
-              child: Center(
-                child: AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 300),
-                  transitionBuilder: (child, anim) =>
-                      FadeTransition(opacity: anim, child: child),
-                  child: _isProcessingRecording
-                      ? SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : _isRecording
-                      ? Row(
-                          key: const ValueKey('recording'),
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                value: _progress > 0 ? _progress : null,
-                                strokeWidth: 2.2,
-                                color: Colors.white,
-                              ),
-                            ),
-                            const SizedBox(width: 8),
-                            Text(
-                              remaining > 0 ? 'STOP • ${remaining}s' : 'STOP',
-                              style: AppStyles.buttonText,
-                            ),
-                          ],
-                        )
-                      : Container(
-                          key: const ValueKey('idle'),
-                          child: const Text(
-                            'RECORD',
-                            // use AppStyles.buttonText via DefaultTextStyle? apply directly
-                            style: AppStyles.buttonText,
-                          ),
-                        ),
+          ],
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (_isProcessingRecording)
+              const SizedBox(
+                width: 36,
+                height: 36,
+                child: CircularProgressIndicator(
+                  strokeWidth: 3,
+                  color: Colors.white,
                 ),
+              )
+            else
+              Icon(
+                _isRecording ? Icons.mic : Icons.mic_none_rounded,
+                size: 56,
+                color: Colors.white,
               ),
+            const SizedBox(height: 10),
+            Text(
+              buttonLabel,
+              style: AppStyles.buttonText.copyWith(color: Colors.white, fontSize: 18),
+              textAlign: TextAlign.center,
             ),
-          );
+            if (_isRecording && remaining > 0) ...[
+              const SizedBox(height: 6),
+              Text(
+                '$remaining s',
+                style: AppStyles.buttonText.copyWith(color: Colors.white70, fontSize: 14),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
   }
 
   // Widget _buildReplayButton() {

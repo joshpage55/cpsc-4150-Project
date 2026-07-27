@@ -92,7 +92,7 @@ class _StudentWordFeedbackPageState extends State<StudentWordFeedbackPage> {
       final passBar = AppScoring.passingThresholdForLevel(wordLevel);
       _normalizeSTTScoreToStars(rawScore: passBar).then((normalized) {
         setState(() {
-          debugPrint("StudentWordFeedbackPage: Passing threshold STT score of $passBar is represented as ${normalized} stars.");
+          debugPrint("StudentWordFeedbackPage: Passing threshold STT score of $passBar is represented as $normalized stars.");
           _passingThresholdStars = normalized;
         });
       });
@@ -102,7 +102,7 @@ class _StudentWordFeedbackPageState extends State<StudentWordFeedbackPage> {
       if (_attemptResult != null && _attemptResult!.score > 0) {
         _normalizeSTTScoreToStars(rawScore: _attemptResult?.score as double).then((normalized) {
           setState(() {
-            debugPrint("StudentWordFeedbackPage: Speech-To-Text (STT) score of ${_attemptResult?.score} is represented as ${normalized} stars.");
+            debugPrint("StudentWordFeedbackPage: Speech-To-Text (STT) score of ${_attemptResult?.score} is represented as $normalized stars.");
             _currentScore = normalized;
           });
         });
@@ -114,7 +114,7 @@ class _StudentWordFeedbackPageState extends State<StudentWordFeedbackPage> {
         if (_currentUser != null) {
           _currentClassSection = context.read<CurrentUserModel>().classSection;
 
-          debugPrint('StudentWordFeedbackPage: User UID: ${_currentUser!.id}, Username: ${_currentUser!.username}, Email: ${_currentUser!.email}, Role: ${_currentUser!.role.name}, ClassSection: ${_currentClassSection?.id}');
+          debugPrint('StudentWordFeedbackPage: User UID: ${_currentUser.id}, Username: ${_currentUser.username}, Email: ${_currentUser.email}, Role: ${_currentUser.role.name}, ClassSection: ${_currentClassSection?.id}');
 
           // Save the attempt record and update student and class progress.
           storeAttempt(
@@ -161,7 +161,7 @@ class _StudentWordFeedbackPageState extends State<StudentWordFeedbackPage> {
     if (percent > 0.0 && rounded == 0.0) rounded = 0.5;
 
     // Ensure within bounds
-    rounded = rounded.clamp(0.0, 5.0) as double;
+    rounded = rounded.clamp(0.0, 5.0);
 
     return rounded;
   }
@@ -376,7 +376,7 @@ class _StudentWordFeedbackPageState extends State<StudentWordFeedbackPage> {
       await _handleTts(assetPath: '${AppConstants.assetPathPhrases}lets_see_how_you_did.mp3');
       await _handleTts(assetPath: '${AppConstants.assetPathPhrases}for_the_word.mp3');
       await _handleTts(assetPath: '${AppConstants.assetPathWords}${practiceWord?.text.trim().toLowerCase()}.mp3');
-      await _handleTts(assetPath: '${AppConstants.assetPathSentences}${practiceWord?.text.trim().toLowerCase()}_${practiceSentenceId}.mp3');
+      await _handleTts(assetPath: '${AppConstants.assetPathSentences}${practiceWord?.text.trim().toLowerCase()}_$practiceSentenceId.mp3');
       await _handleTts(assetPath: assetPathScore);
 
       // Provide additional guidance based on score (e.g. Next or Retry to continue).
@@ -458,7 +458,7 @@ class _StudentWordFeedbackPageState extends State<StudentWordFeedbackPage> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   IconButton(
-                      icon: Icon(Icons.account_circle, color: (_isIntroductionTtsPlaying) ? AppColors.bgPrimaryDarkGrey.withOpacity(0.5) : AppColors.buttonPrimaryGray),
+                      icon: Icon(Icons.account_circle, color: (_isIntroductionTtsPlaying) ? AppColors.bgPrimaryDarkGrey.withValues(alpha: 0.5) : AppColors.buttonPrimaryGray),
                       onPressed: () {
                         if (!_isIntroductionTtsPlaying) {
                           debugPrint("Icon Pressed - navigating to profile settings.");
@@ -560,15 +560,41 @@ class _StudentWordFeedbackPageState extends State<StudentWordFeedbackPage> {
     );
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
-      child: Text(
-        tip,
-        textAlign: TextAlign.center,
-        style: const TextStyle(
-          fontFamily: 'SF Compact Display',
-          fontSize: 18,
-          fontWeight: FontWeight.w500,
-          color: Colors.black87,
-          height: 1.25,
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: AppColors.bgPrimaryLightBlue,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.buttonPrimaryGray.withOpacity(0.25)),
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Icon(Icons.lightbulb_outline, color: AppColors.buttonPrimaryBlue, size: 28),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Try this next',
+                    style: AppStyles.subheaderText.copyWith(fontSize: 16, fontWeight: FontWeight.w700),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    tip,
+                    style: const TextStyle(
+                      fontFamily: 'SF Compact Display',
+                      fontSize: 17,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.black87,
+                      height: 1.25,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -742,7 +768,7 @@ class _StudentWordFeedbackPageState extends State<StudentWordFeedbackPage> {
             height: 100,
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFC6C0).withOpacity(0.20),
+              color: const Color(0xFFFFC6C0).withValues(alpha: 0.20),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -802,7 +828,7 @@ class _StudentWordFeedbackPageState extends State<StudentWordFeedbackPage> {
       iconSize: 40,
       tooltip: 'Play Practice Word Sentence',
       onPressed: () {
-        _handleTts(assetPath: '${AppConstants.assetPathSentences}${practiceWord?.text.trim().toLowerCase()}_${practiceSentenceId}.mp3');
+        _handleTts(assetPath: '${AppConstants.assetPathSentences}${practiceWord?.text.trim().toLowerCase()}_$practiceSentenceId.mp3');
       },
     );
   } 
@@ -860,7 +886,7 @@ class _StudentWordFeedbackPageState extends State<StudentWordFeedbackPage> {
       height: 60,
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFFE0F7FA).withOpacity(0.3),
+        color: const Color(0xFFE0F7FA).withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(6),
       ),
       child: Center(

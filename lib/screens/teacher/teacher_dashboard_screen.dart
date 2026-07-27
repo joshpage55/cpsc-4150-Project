@@ -588,6 +588,44 @@ class _StudentsTabState extends State<StudentsTab> {
       children: [
         Row(
           children: [
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () => _showAddStudentDialog(context),
+                icon: const Icon(Icons.person_add_rounded),
+                label: const Text('Add Student'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.buttonPrimaryBlue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/teacher-story-builder');
+                },
+                icon: const Icon(Icons.auto_awesome_rounded),
+                label: const Text('Story Builder'),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppColors.buttonPrimaryBlue,
+                  side: const BorderSide(color: AppColors.buttonPrimaryBlue),
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
             // Search field
             Expanded(
               child: TextField(
@@ -613,13 +651,6 @@ class _StudentsTabState extends State<StudentsTab> {
                   });
                 },
               ),
-            ),
-            const SizedBox(width: 8),
-            // Add student button
-            IconButton(
-              icon: const Icon(Icons.person_add),
-              tooltip: 'Add Student',
-              onPressed: () => _showAddStudentDialog(context),
             ),
             const SizedBox(width: 8),
             // Sort

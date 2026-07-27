@@ -13,26 +13,22 @@ class LandingPage extends StatefulWidget {
 }
 
 class _LandingPageState extends State<LandingPage> {
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(Duration(seconds: 3), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(
-            builder: (context) => ReaderSelectionPage(),
-          ),
-        );
-      }
-    });
+  void _goToSelection() {
+    Navigator.of(context).pushReplacement(
+      MaterialPageRoute(
+        builder: (context) => const ReaderSelectionPage(),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.bgPrimaryWhite,
-      body: Center(
-        child: Stack(
+    return GestureDetector(
+      onTap: _goToSelection,
+      child: Scaffold(
+        backgroundColor: AppColors.bgPrimaryWhite,
+        body: Center(
+          child: Stack(
           clipBehavior: Clip.none,
           children: [
             // This is just in the background to create the large orange oval for some visual interest.
@@ -107,6 +103,21 @@ class _LandingPageState extends State<LandingPage> {
                         width: 327,
                         height: 537,
                         semanticsLabel: 'Yeti drinking beverage',
+                      ),
+                    ),
+                    Positioned(
+                      bottom: 56,
+                      left: 0,
+                      right: 0,
+                      child: Column(
+                        children: [
+                          const Icon(Icons.touch_app_rounded, size: 28, color: Colors.white),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Tap to start',
+                            style: AppStyles.buttonText.copyWith(color: Colors.white),
+                          ),
+                        ],
                       ),
                     ),
                   ],

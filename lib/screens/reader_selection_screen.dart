@@ -73,46 +73,48 @@ class ReaderSelectionPage extends StatelessWidget {
                 children: [
                   SizedBox(
                     width: double.infinity,
-                    height: 44,
-                    child: ElevatedButton(
+                    height: 84,
+                    child: ElevatedButton.icon(
                       onPressed: () {
-                        // Navigate to instructor flow; allow navigation back to this page if needed.
                         Navigator.pushNamed(context, '/teacher-login');
                       },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.buttonPrimaryBlue,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(1000),
-                        ),
-                        elevation: 5,
-                      ),
-                      child: Text(
+                      icon: const Icon(Icons.school_rounded, size: 28),
+                      label: Text(
                         'TEACHER',
                         style: AppStyles.buttonText,
                       ),
-                    ),
-                  ),
-                  SizedBox(height: 40),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 44,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Navigate to student flow; allow navigation back to this page if needed.
-                        Navigator.pushNamed(context, '/student-login');
-                      },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.buttonPrimaryOrange,
+                        backgroundColor: AppColors.buttonPrimaryBlue,
                         foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(1000),
                         ),
                         elevation: 5,
                       ),
-                      child: Text(
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 84,
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/student-login');
+                      },
+                      icon: const Icon(Icons.face_rounded, size: 28),
+                      label: Text(
                         'STUDENT',
-                        style: AppStyles.buttonText, 
+                        style: AppStyles.buttonText,
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.buttonPrimaryOrange,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(1000),
+                        ),
+                        elevation: 5,
                       ),
                     ),
                   ),
