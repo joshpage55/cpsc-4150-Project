@@ -23,6 +23,12 @@ The sections below retain the original Milestone 1 descriptions and call out **M
 
 ## Milestone 3 — Audio Retention + Analytics + Hardening (Overview)
 
+Milestone 3 extends the app beyond pronunciation practice by adding two new learning experiences that align with the PRD:
+
+- **Teacher Story Builder** — teachers can create a Dolch-themed story draft for a student, review it, and approve it for later reading.
+- **Student Story Reading** — approved stories appear in a student-facing view so reading practice feels like a game and not just a drill.
+- **Word Match game path** — the app now includes a Dolch-based game flow using the same word bank as the practice experience, with immediate feedback and a simple, child-friendly interaction model.
+
 **.github/workflows/flutter-ci.yml**
   - Github Workflow Action (Continuous Integration/Delivery) is set up to run test suite (e.g. unit, widget, integration) and build out artifacts like Android APK files when committing code to the main branch.
   
@@ -86,6 +92,21 @@ Users identify as either **Teacher** or **Student**, determining which side of t
 
 **reader_selection_screen**
 > The reader selection screen presents a role selection where users identify themselves as either instructors or students. These are the only two operations for this screen, but they carry larger implications as to what side of the app the user will enter, i.e., the instructor portal for instructors or the learning portal for students. 
+
+### ✨ Milestone 3 Flow Notes — Story + Game
+
+#### 📖 Story flow
+- A teacher signs in and opens the **Story Builder** from the teacher dashboard.
+- The teacher selects a student, a reading level, and an interest topic.
+- The app generates a short story draft using Dolch-aligned vocabulary and the chosen theme.
+- The teacher can preview the draft, regenerate it, or approve it for the student.
+- Once approved, the story is available in the student’s **Stories** view for later reading.
+
+#### 🎮 Word Match game flow
+- The game experience is designed around the same Dolch word bank used by the practice flow.
+- A student hears or sees a target word and selects the correct match from a small set of options.
+- The interaction is intentionally simple and visual, with immediate feedback so the learner can keep trying without frustration.
+- The game is intended to reinforce the same sight words practiced in the pronunciation pipeline rather than create a separate curriculum.
 
 ---
 
