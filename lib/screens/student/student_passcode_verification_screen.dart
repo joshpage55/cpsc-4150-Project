@@ -2,12 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_otp_text_field/flutter_otp_text_field.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:readright/models/current_user_model.dart';
 import 'package:readright/services/user_repository.dart';
 
 import '../../utils/app_colors.dart';
-import '../../utils/app_constants.dart';
 import '../../utils/app_styles.dart';
 import '../../utils/enums.dart';
 
@@ -140,24 +138,13 @@ class _StudentPasscodeVerificationPageState
     // to prevent going back to the login screen.
     // Only navigate if the widget is still mounted after the delay.
     if (mounted) {
-      final prefs = await SharedPreferences.getInstance();
-      if (prefs.getBool(AppConstants.prefShowStudentWordDashboardScreen) == true) {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/student-word-dashboard',
-          (Route<dynamic> route) => false,
-        );
-      } else {
-        Navigator.pushNamedAndRemoveUntil(
-          context,
-          '/student-word-practice',
-          (Route<dynamic> route) => false,
-          arguments: {
-            'wordLevel': context.read<CurrentUserModel>().currentWordLevel,
-          },
-        );
-      }
-      
+      // Land on the dashboard after login. Auto-opening practice hangs in
+      // Chrome because that screen is deferred-loaded and uses dart:io.
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/student-word-dashboard',
+        (Route<dynamic> route) => false,
+      );
     }
   }
 

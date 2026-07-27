@@ -234,6 +234,22 @@ class ReadRightApp extends StatelessWidget {
         '/student-word-practice': (context) => FutureBuilder<void>(
               future: student_practice.loadLibrary(),
               builder: (context, snap) {
+                if (snap.hasError) {
+                  return Scaffold(
+                    body: Center(
+                      child: Padding(
+                        padding: const EdgeInsets.all(24),
+                        child: Text(
+                          'Word practice is not available in this browser.\n'
+                          'Use the student word dashboard instead, or run on '
+                          'macOS/Android for recording.\n\n'
+                          '${snap.error}',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  );
+                }
                 if (snap.connectionState == ConnectionState.done) {
                   return student_practice.StudentWordPracticePage();
                 }
