@@ -7,49 +7,49 @@
 
 ## Prompt 1
 
-[What you asked the AI]
+Summarize the provided project
 
-[What you used, changed, or rejected]
+The provided explanation made it easier to understand the codebase that was provided. 
 
 ---
 
 ## Prompt 2
 
-[What you asked the AI]
+Map out the progression that is required using the files within milestone0, milestone1, milestone2, milestone3, and milestoneFinal to complete this project.
 
-[What you used, changed, or rejected]
+The provided map was helpful in determining what was required by all team members and what needed to be completed.
 
 ---
 
 ## Prompt 3
 
-[What you asked the AI]
+How do I get the project to run on android emulator?
 
-[What you used, changed, or rejected]
+I used the provided steps, however, I took slightly different steps to achieve the desired goal.
 
 ---
 
 ## Prompt 4
 
-[What you asked the AI]
+What is causing the project to lag when using the emulator?
 
-[What you used, changed, or rejected]
+It simply mentioned that it was most likely some settings with the emulator, however, I believe that it was, more than likely, caused by running it on a cheap laptop.
 
 ---
 
 ## Prompt 5
 
-[What you asked the AI]
+What does firebase do?
 
-[What you used, changed, or rejected]
+It gave an explanation of firebase and its functions, which helped me understand the tools that were provided.
 
 ---
 
 ## Prompt 6
 
-[What you asked the AI]
+Provide a roadmap for milestone 3.
 
-[What you used, changed, or rejected]
+It gave a simple roadmap, illustrating what was necessary to implement for the next milestone.
 
 
 # Prompt Log — Gabriel Scott Walker
